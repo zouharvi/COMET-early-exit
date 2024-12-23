@@ -22,6 +22,7 @@ Metrics
 from itertools import combinations
 from typing import Any, Callable, List, Optional
 
+import numpy as np
 import pandas as pd
 import scipy.stats as stats
 import torch
@@ -141,6 +142,68 @@ class RegressionMetrics(Metric):
                 preds.cpu().tolist(), target.cpu().tolist(), self.systems
             )
             report["system_acc"] = system_acc
+
+        return report
+
+class EarlyExitMetrics(Metric):
+    is_differentiable = False
+    higher_is_better = True
+    full_state_update = False
+    preds: List[torch.Tensor]
+    target: List[torch.Tensor]
+
+    def __init__(
+        self,
+        num_layers : int,
+        prefix: str = "",
+        dist_sync_on_step: bool = False,
+        process_group: Optional[Any] = None,
+        dist_sync_fn: Optional[Callable] = None,
+    ) -> None:
+        super().__init__(
+            dist_sync_on_step=dist_sync_on_step,
+            process_group=process_group,
+            dist_sync_fn=dist_sync_fn,
+        )
+
+        # TODO: here we manually instantiate the state instead of registering
+        # with the library. This might have some dire consequences later on.
+        self.preds = []
+        self.target = []
+        # self.add_state("preds", default=[], dist_reduce_fx=None)
+        # self.add_state("target", default=[], dist_reduce_fx=None)
+
+        self.prefix = prefix
+        self.num_layers = num_layers
+
+    def update(
+        self,
+        preds: torch.Tensor,
+        target: torch.Tensor,
+        systems: Optional[List[str]] = None,
+    ) -> None:  # type: ignore
+        """Update state with predictions and targets.
+
+        Args:
+            preds (torch.Tensor): Predictions from model
+            target (torch.Tensor): Ground truth values
+        """
+        # flip dimensions to be [samples/batch, layers]
+        self.preds += preds.T.tolist()
+        self.target += target.T.tolist()
+
+    def compute(self):
+        """Computes pearson correlation coefficient."""
+        report = {}
+        for layer in range(self.num_layers):
+            preds = [x[layer] for x in self.preds]
+            # target should be the same across all layers
+            target = [x[layer] for x in self.target]
+            pearson, _ = stats.pearsonr(preds, target)
+            report = {
+                f"{self.prefix}_l{layer}_pearson": pearson,
+            }
+        report[f"{self.prefix}_avg_pearson"] = np.average(list(report.values()))
 
         return report
 

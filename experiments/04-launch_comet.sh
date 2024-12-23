@@ -27,9 +27,6 @@ function sbatch_gpu_short() {
 }
 
 
-sbatch_gpu "firstrun_pairwise" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
-
-# export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+sbatch_gpu "firstrun_train" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
 
 sbatch_gpu_short "eval_firstrun_da" "python3 experiments/07-evaluate_da_model.py lightning_logs/version_18089129/checkpoints/epoch=2-step=3552-val_kendall=0.035.ckpt"
-sbatch_gpu_short "eval_firstrun_pw" "python3 experiments/06-evaluate_pw_model.py lightning_logs/version_18088243/checkpoints/epoch=1-step=4298-val_accuracy=0.618.ckpt"

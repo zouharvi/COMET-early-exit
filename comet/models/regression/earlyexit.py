@@ -29,7 +29,8 @@ from comet.models.utils import Prediction, Target
 from comet.modules import FeedForward
 from comet.models.base import tensor_lru_cache, CACHE_SIZE
 from comet.models.pooling_utils import average_pooling, max_pooling
-
+from comet.models.metrics import EarlyExitMetrics
+from torch import nn
 
 
 class EarlyExitRegression(RegressionMetric):
@@ -166,12 +167,22 @@ class EarlyExitRegression(RegressionMetric):
 
         # duplicate the scores to the number of output layers because we do a prediction from each layer
         scores = [[float(s["score"])]*self.encoder.num_layers for s in sample]
-        targets = Target(score=torch.tensor(scores, dtype=torch.float))
+        # transpose to be [samples/batch, layers]
+        targets = Target(score=torch.tensor(scores, dtype=torch.float).T)
 
         if "system" in inputs:
             targets["system"] = inputs["system"]
 
         return model_inputs, targets
+    
+
+    def init_metrics(self):
+        """Initializes train/validation metrics."""
+        self.train_metrics = EarlyExitMetrics(num_layers=self.encoder.num_layers, prefix="train")
+        self.val_metrics = nn.ModuleList([
+            EarlyExitMetrics(num_layers=self.encoder.num_layers, prefix=d)
+            for d in self.hparams.validation_data
+        ])
 
     def forward(
         self,
@@ -204,9 +215,9 @@ class EarlyExitRegression(RegressionMetric):
             embedded_sequences = torch.cat(
                 (mt_sentemb, src_sentemb, prod_src, diff_src), dim=1
             )
-            predictions.append(Prediction(score=self.estimator(embedded_sequences).view(-1)))
+            predictions.append(self.estimator(embedded_sequences).view(-1))
 
-        return Prediction(score=[x.score for x in predictions])
+        return Prediction(score=torch.stack(predictions))
 
     def read_training_data(self, path: str) -> List[dict]:
         """Method that reads the training data (a csv file) and returns a list of
