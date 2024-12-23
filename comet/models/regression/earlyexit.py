@@ -206,18 +206,16 @@ class EarlyExitRegression(RegressionMetric):
         src_sentembs = self.get_sentence_embedding(src_input_ids, src_attention_mask)
         mt_sentembs = self.get_sentence_embedding(mt_input_ids, mt_attention_mask)
 
-        predictions = []
-        # TODO: paralelize
-        for src_sentemb, mt_sentemb in zip(src_sentembs, mt_sentembs):
-            diff_src = torch.abs(mt_sentemb - src_sentemb)
-            prod_src = mt_sentemb * src_sentemb
+        # paralel computation from all layers
+        diff_src = torch.abs(mt_sentembs - src_sentembs)
+        prod_src = mt_sentembs * src_sentembs
+        embedded_sequences = torch.cat(
+            (mt_sentembs, src_sentembs, prod_src, diff_src), dim=2
+        )
+        # last dimension is [1]
+        output = self.estimator(embedded_sequences).squeeze(dim=2)
 
-            embedded_sequences = torch.cat(
-                (mt_sentemb, src_sentemb, prod_src, diff_src), dim=1
-            )
-            predictions.append(self.estimator(embedded_sequences).view(-1))
-
-        return Prediction(score=torch.stack(predictions))
+        return Prediction(score=output)
 
     def read_training_data(self, path: str) -> List[dict]:
         """Method that reads the training data (a csv file) and returns a list of
@@ -328,6 +326,10 @@ class EarlyExitRegression(RegressionMetric):
         #     )
 
         # elif self.hparams.layer >= 0 and self.hparams.layer < self.encoder.num_layers:
+
+        # NOTE: if we use some intermediary computation, we mess up the graph?
+        return torch.stack([x[:,0,:] for x in encoder_out["all_layers"]])
+
         sentembs = []
         for embeddings in encoder_out["all_layers"]:
             if self.hparams.pool == "default":
@@ -356,7 +358,7 @@ class EarlyExitRegression(RegressionMetric):
             
             sentembs.append(sentemb)
 
-        return sentembs
+        return torch.stack(sentembs)
 
 
     def predict_step(
