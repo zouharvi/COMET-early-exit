@@ -15,7 +15,7 @@ earlyexit_metric:
     layer_norm: False
     loss: mse
     dropout: 0.1
-    batch_size: 16
+    batch_size: 8
     train_data: 
       - data/csv/train_da.csv
     validation_data: 

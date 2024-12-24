@@ -200,9 +200,7 @@ class EarlyExitMetrics(Metric):
             # target should be the same across all layers
             target = [x[layer] for x in self.target]
             pearson, _ = stats.pearsonr(preds, target)
-            report = {
-                f"{self.prefix}_l{layer}_pearson": pearson,
-            }
+            report[f"{self.prefix}_l{layer}_pearson"] = pearson
         report[f"{self.prefix}_avg_pearson"] = np.average(list(report.values()))
 
         return report

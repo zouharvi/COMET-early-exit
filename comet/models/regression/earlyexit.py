@@ -180,7 +180,7 @@ class EarlyExitRegression(RegressionMetric):
         """Initializes train/validation metrics."""
         self.train_metrics = EarlyExitMetrics(num_layers=self.encoder.num_layers, prefix="train")
         self.val_metrics = nn.ModuleList([
-            EarlyExitMetrics(num_layers=self.encoder.num_layers, prefix=d)
+            EarlyExitMetrics(num_layers=self.encoder.num_layers, prefix="val")
             for d in self.hparams.validation_data
         ])
 
