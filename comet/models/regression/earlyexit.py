@@ -20,17 +20,22 @@ EarlyExitRegression
     looking at source and translation.
 """
 from typing import Dict, List, Optional, Tuple, Union
+import warnings
 
+import numpy as np
 import pandas as pd
 import torch
 
 from comet.models.regression.regression_metric import RegressionMetric
 from comet.models.utils import Prediction, Target
 from comet.modules import FeedForward
-from comet.models.base import tensor_lru_cache, CACHE_SIZE
 from comet.models.pooling_utils import average_pooling, max_pooling
 from comet.models.metrics import EarlyExitMetrics
 from torch import nn
+import pytorch_lightning as ptl
+from ..predict_pbar import PredictProgressBar
+from torch.utils.data import DataLoader
+
 
 
 class EarlyExitRegression(RegressionMetric):
@@ -253,51 +258,6 @@ class EarlyExitRegression(RegressionMetric):
 
 
     # override functions from base because we compute embeddings slightly differently
-    def get_sentence_embedding(
-        self,
-        input_ids: torch.Tensor,
-        attention_mask: torch.Tensor,
-        token_type_ids: Optional[torch.Tensor] = None,
-    ) -> List[torch.Tensor]:
-        """Function that extracts sentence embeddings for
-        a single sentence and allows for caching embeddings.
-
-        Args:
-            tokens (torch.Tensor): sequences [batch_size x seq_len].
-            attention_mask (torch.Tensor): attention_mask [batch_size x seq_len].
-            token_type_ids (torch.Tensor): Model token_type_ids [batch_size x seq_len].
-                Optional
-
-        Returns:
-            torch.Tensor [batch_size x hidden_size] with sentence embeddings.
-        """
-        if self.caching:
-            return self.retrieve_sentence_embedding(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                token_type_ids=token_type_ids,
-            )
-        else:
-            return self.compute_sentence_embedding(
-                input_ids,
-                attention_mask,
-                token_type_ids=token_type_ids,
-            )
-
-    @tensor_lru_cache(maxsize=CACHE_SIZE)
-    def retrieve_sentence_embedding(
-        self,
-        input_ids: torch.Tensor,
-        attention_mask: torch.Tensor,
-        token_type_ids: Optional[torch.Tensor] = None,
-    ) -> List[torch.Tensor]:
-        """Wrapper for `get_sentence_embedding` function that caches results."""
-        return self.compute_sentence_embedding(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            token_type_ids=token_type_ids,
-        )
-
     def compute_sentence_embedding(
         self,
         input_ids: torch.Tensor,
@@ -378,8 +338,78 @@ class EarlyExitRegression(RegressionMetric):
         Return:
             Predicion object
         """
-        model_outputs = Prediction(scores=self(**batch).scores)
+        model_outputs = Prediction(scores=self(**batch).score)
         if self.mc_dropout:
             raise Exception("MC Dropout not available for Early Exit now")
         
         return model_outputs
+
+
+
+    def predict(
+        self,
+        samples: List[Dict[str, str]],
+        batch_size: int = 16,
+        gpus: int = 1,
+        devices: Union[List[int], str, int] = None,
+        mc_dropout: int = 0,
+        progress_bar: bool = True,
+        accelerator: str = "auto",
+        num_workers: int = None,
+        length_batching: bool = True,
+    ) -> Prediction:
+        """
+        This is a stripped down version of the predict method of base.py without metadata and length batching but
+        with support for early exit model.
+        """
+        if mc_dropout > 0:
+            self.set_mc_dropout(mc_dropout)
+        assert gpus <= 1
+
+        if gpus > 0 and devices is not None:
+            assert len(devices) == gpus, AssertionError(
+                "List of devices must be same size as `gpus` or None if `gpus=0`"
+            )
+        elif gpus > 0:
+            devices = gpus
+        else: # gpu = 0
+            devices = "auto"
+        
+
+        self.eval()
+        dataloader = DataLoader(
+            dataset=samples,
+            batch_size=batch_size,
+            collate_fn=self.prepare_for_inference,
+            num_workers=2,
+            multiprocessing_context="fork" if torch.backends.mps.is_available() else None,
+        )
+        callbacks = []
+
+        if progress_bar:
+            enable_progress_bar = True
+            callbacks.append(PredictProgressBar())
+        else:
+            enable_progress_bar = False
+
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message=".*Consider increasing the value of the `num_workers` argument` .*",
+        )
+        trainer = ptl.Trainer(
+            devices=devices,
+            logger=False,
+            callbacks=callbacks,
+            accelerator=accelerator if gpus > 0 else "cpu",
+            strategy="auto" if gpus < 2 else "ddp",
+            enable_progress_bar=enable_progress_bar,
+        )
+        predictions = trainer.predict(
+            self, dataloaders=dataloader, return_predictions=True
+        )
+
+        scores = torch.cat([pred["scores"] for pred in predictions], dim=1).T.tolist()
+        output = Prediction(scores=scores, system_score=np.average(scores, axis=0))
+
+        return output
