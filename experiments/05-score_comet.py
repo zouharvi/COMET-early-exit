@@ -3,7 +3,7 @@ import csv
 import scipy.stats
 import numpy as np
 
-model = comet.load_from_checkpoint("/cluster/work/sachan/vilem/comet-early-exit/lightning_logs/version_19245790/checkpoints/epoch=3-step=46912-val_avg_pearson=0.306.ckpt")
+model = comet.load_from_checkpoint("lightning_logs/version_19245790/checkpoints/epoch=3-step=46912-val_avg_pearson=0.306.ckpt")
 data = list(csv.DictReader(open("data/csv/dev_da.csv", "r")))
 pred_y = np.array(model.predict(data, batch_size=32)["scores"]).T
 
