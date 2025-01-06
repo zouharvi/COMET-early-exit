@@ -27,12 +27,14 @@ from .multitask.xcomet_metric import XCOMETMetric
 from .ranking.ranking_metric import RankingMetric
 from .regression.referenceless import ReferencelessRegression
 from .regression.earlyexit import EarlyExitRegression
+from .regression.earlyexit2 import EarlyExit2Regression
 from .regression.regression_metric import RegressionMetric
 from .download_utils import download_model_legacy
 
 
 str2model = {
     "earlyexit_metric": EarlyExitRegression,
+    "earlyexit2_metric": EarlyExit2Regression,
     "referenceless_regression_metric": ReferencelessRegression,
     "regression_metric": RegressionMetric,
     "ranking_metric": RankingMetric,

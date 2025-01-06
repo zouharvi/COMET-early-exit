@@ -27,7 +27,25 @@ function sbatch_gpu_short() {
 }
 
 
-sbatch_gpu "firstrun_train" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
+function sbatch_gpu_big() {
+    JOB_NAME=$1;
+    JOB_WRAP=$2;
+    mkdir -p logs
+
+    sbatch \
+        -J $JOB_NAME --output=logs/%x.out --error=logs/%x.err \
+        --gpus=1 --gres=gpumem:40g \
+        --ntasks-per-node=1 \
+        --cpus-per-task=6 \
+        --mem-per-cpu=8G --time=1-0 \
+        --wrap="$JOB_WRAP";
+}
+
+
+
+sbatch_gpu_big "firstrun_train" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
+sbatch_gpu_big "confidence_human" "comet-train --cfg configs/experimental/earlyexit2_model_human.yaml"
+sbatch_gpu_big "confidence_last" "comet-train --cfg configs/experimental/earlyexit2_model_last.yaml"
 
 sbatch_gpu_short "firstrun_eval" "python3 experiments/05-score_comet.py"
 

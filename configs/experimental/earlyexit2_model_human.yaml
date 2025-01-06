@@ -1,5 +1,5 @@
-earlyexit_metric:
-  class_path: comet.models.EarlyExitRegression
+earlyexit2_metric:
+  class_path: comet.models.EarlyExit2Regression
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True
@@ -24,6 +24,7 @@ earlyexit_metric:
       - 2048
       - 1024
     activations: Tanh
+    confidence_target: human
     
 trainer: trainer.yaml
 early_stopping: early_stopping.yaml
