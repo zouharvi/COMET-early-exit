@@ -24,7 +24,7 @@ earlyexit2_metric:
       - 2048
       - 1024
     activations: Tanh
-    confidence_target: human
+    confidence_target: last
     
 trainer: trainer.yaml
 early_stopping: early_stopping.yaml

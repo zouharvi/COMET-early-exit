@@ -339,11 +339,16 @@ class EarlyExit2Regression(RegressionMetric):
         batch_prediction = self.forward(**batch_input)
 
         loss_value_score = self.loss_score(batch_prediction.score, batch_target.score)
-        if self.confidence_target == "human":
-            loss_value_confidence = self.loss_confidence(batch_prediction.confidence, torch.abs(batch_prediction.score.detach()-batch_target.score))
-        elif self.confidence_target == "last":
-            # TODO: is -1 the last or 0 the last?
-            loss_value_confidence = self.loss_confidence(batch_prediction.confidence, torch.abs(batch_prediction.score.detach()-batch_prediction.score.detach()[-1,:]))
+        
+        # propagate confidence loss only later on once the model is somewhat learned
+        if not self._frozen:
+            if self.confidence_target == "human":
+                loss_value_confidence = self.loss_confidence(batch_prediction.confidence, torch.abs(batch_prediction.score.detach()-batch_target.score))
+            elif self.confidence_target == "last":
+                # TODO: is -1 the last or 0 the last?
+                loss_value_confidence = self.loss_confidence(batch_prediction.confidence, torch.abs(batch_prediction.score.detach()-batch_prediction.score.detach()[-1,:]))
+        else:
+            loss_value_confidence = 0
 
         if (
             self.nr_frozen_epochs < 1.0
@@ -367,7 +372,9 @@ class EarlyExit2Regression(RegressionMetric):
             on_epoch=True,
             batch_size=batch_target.score.shape[0],
         )
-        return loss_value_score+loss_value_confidence
+
+        # confidence loss is less important
+        return loss_value_score+0.5*loss_value_confidence
 
     def predict(
         self,
