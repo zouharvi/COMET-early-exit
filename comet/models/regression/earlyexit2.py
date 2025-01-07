@@ -26,17 +26,30 @@ import numpy as np
 import pandas as pd
 import torch
 
+from torch.utils.data import DataLoader, SequentialSampler
+from ..predict_writer import CustomWriter
+
 from comet.models.regression.regression_metric import RegressionMetric
 from comet.models.utils import Prediction, Target
 from comet.modules import FeedForward
-from comet.models.pooling_utils import average_pooling, max_pooling
 from comet.models.metrics import EarlyExitMetrics
 from torch import nn
 import pytorch_lightning as ptl
 from ..predict_pbar import PredictProgressBar
 from torch.utils.data import DataLoader
+from ..utils import (
+    OrderedSampler,
+    Prediction,
+    Target,
+    flatten_metadata,
+    restore_list_order,
+)
 
 
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 class EarlyExit2Regression(RegressionMetric):
     """EarlyExit2Regression:
@@ -319,7 +332,165 @@ class EarlyExit2Regression(RegressionMetric):
         if self.mc_dropout:
             raise Exception("MC Dropout not available for Early Exit now")
         
-        return Prediction(scores=self(**batch).score)
+        output = self(**batch)
+        return Prediction(scores=output.score, confidences=output.confidence)
+    
+
+    def predict_with_confidence(
+        self,
+        samples: List[Dict[str, str]],
+        batch_size: int = 16,
+        gpus: int = 1,
+        devices: Union[List[int], str, int] = None,
+        mc_dropout: int = 0,
+        progress_bar: bool = True,
+        accelerator: str = "auto",
+        num_workers: int = None,
+        length_batching: bool = True,
+    ) -> Prediction:
+        """Method that receives a list of samples (dictionaries with translations,
+        sources and/or references) and returns segment-level scores, system level score
+        and any other metadata outputed by COMET models. If `mc_dropout` is set, it
+        also returns for each segment score, a confidence value.
+
+        Args:
+            samples (List[Dict[str, str]]): List with dictionaries with source,
+                translations and/or references.
+            batch_size (int): Batch size used during inference. Defaults to 16
+            devices (Optional[List[int]]): A sequence of device indices to be used.
+                Default: None.
+            mc_dropout (int): Number of inference steps to run using MCD. Defaults to 0
+            progress_bar (bool): Flag that turns on and off the predict progress bar.
+                Defaults to True
+            accelarator (str): Pytorch Lightning accelerator (e.g: 'cpu', 'cuda', 'hpu'
+                , 'ipu', 'mps', 'tpu'). Defaults to 'auto'
+            num_workers (int): Number of workers to use when loading and preparing
+                data. Defaults to None
+            length_batching (bool): If set to true, reduces padding by sorting samples
+                by sequence length. Defaults to True.
+
+        Return:
+            Prediction object with `scores`, `system_score` and any metadata returned
+                by the model.
+        """
+        # NOTE: this function was copied from base.py and modified to also output the confidences
+
+        print("Running our predict")
+
+        if mc_dropout > 0:
+            self.set_mc_dropout(mc_dropout)
+
+        if gpus > 0 and devices is not None:
+            assert len(devices) == gpus, AssertionError(
+                "List of devices must be same size as `gpus` or None if `gpus=0`"
+            )
+        elif gpus > 0:
+            devices = gpus
+        else: # gpu = 0
+            devices = "auto"
+
+        sampler = SequentialSampler(samples)
+        if length_batching and gpus < 2:
+            try:
+                sort_ids = np.argsort([len(sample["src"]) for sample in samples])
+            except KeyError:
+                sort_ids = np.argsort([len(sample["ref"]) for sample in samples])
+            sampler = OrderedSampler(sort_ids)
+
+        # On Windows, only num_workers=0 is supported.
+        is_windows = os.name == "nt"
+        if num_workers is None:
+            # Guideline for workers that typically works well.
+            num_workers = 0 if is_windows else 2 * gpus
+        elif is_windows and num_workers != 0:
+            logger.warning(
+                "Due to limits of multiprocessing on Windows, it is likely that setting num_workers > 0 will result"
+                " in scores of 0. It is therefore recommended to set num_workers=0 or leave it to None (default)."
+            )
+
+        self.eval()
+        dataloader = DataLoader(
+            dataset=samples,
+            batch_size=batch_size,
+            sampler=sampler,
+            collate_fn=self.prepare_for_inference,
+            num_workers=num_workers,
+            multiprocessing_context="fork" if torch.backends.mps.is_available() else None,
+        )
+        if gpus > 1:
+            pred_writer = CustomWriter()
+            callbacks = [
+                pred_writer,
+            ]
+        else:
+            callbacks = []
+
+        if progress_bar:
+            enable_progress_bar = True
+            callbacks.append(PredictProgressBar())
+        else:
+            enable_progress_bar = False
+
+        warnings.filterwarnings(
+            "ignore",
+            category=UserWarning,
+            message=".*Consider increasing the value of the `num_workers` argument` .*",
+        )
+        trainer = ptl.Trainer(
+            devices=devices,
+            logger=False,
+            callbacks=callbacks,
+            accelerator=accelerator if gpus > 0 else "cpu",
+            strategy="auto" if gpus < 2 else "ddp",
+            enable_progress_bar=enable_progress_bar,
+        )
+        return_predictions = False if gpus > 1 else True
+        predictions = trainer.predict(
+            self, dataloaders=dataloader, return_predictions=return_predictions
+        )
+        if gpus > 1:
+            torch.distributed.barrier()  # Waits for all processes to finish predict
+
+        # If we are in the GLOBAL RANK we need to gather all predictions
+        if gpus > 1 and trainer.is_global_zero:
+            predictions = pred_writer.gather_all_predictions()
+            # Delete Temp folder.
+            pred_writer.cleanup()
+            return predictions
+
+        elif gpus > 1 and not trainer.is_global_zero:
+            # If we are not in the GLOBAL RANK we will return None
+            exit()
+
+        print(len(predictions), predictions[0]["scores"].shape)
+        scores = torch.cat([pred["scores"] for pred in predictions], dim=1).T.tolist()
+        confidences = torch.cat([pred["confidences"] for pred in predictions], dim=1).T.tolist()
+        if "metadata" in predictions[0]:
+            metadata = flatten_metadata([pred["metadata"] for pred in predictions])
+        else:
+            metadata = []
+
+        output = Prediction(
+            scores=scores,
+            confidences=confidences
+        )
+
+        # Restore order of samples!
+        if length_batching and gpus < 2:
+            output["scores"] = restore_list_order(scores, sort_ids)
+            output["confidences"] = restore_list_order(confidences, sort_ids)
+            if metadata:
+                output["metadata"] = Prediction(
+                    **{k: restore_list_order(v, sort_ids) for k, v in metadata.items()}
+                )
+            return output
+        else:
+            # Add metadata to output
+            if metadata:
+                output["metadata"] = metadata
+
+            return output
+
 
     def training_step(
         self,

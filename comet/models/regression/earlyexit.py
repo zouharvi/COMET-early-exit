@@ -361,7 +361,10 @@ class EarlyExitRegression(RegressionMetric):
         """
         This is a stripped down version of the predict method of base.py without metadata and length batching but
         with support for early exit model.
+
+        See earlyexit2.py for a more complete version.
         """
+
         if mc_dropout > 0:
             self.set_mc_dropout(mc_dropout)
         assert gpus <= 1
