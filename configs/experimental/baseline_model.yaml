@@ -26,5 +26,5 @@ referenceless_regression_metric:
     activations: Tanh
     
 trainer: trainer.yaml
-early_stopping: early_stopping.yaml
-model_checkpoint: model_checkpoint.yaml
+early_stopping: baseline_early_stopping.yaml
+model_checkpoint: baseline_model_checkpoint.yaml
