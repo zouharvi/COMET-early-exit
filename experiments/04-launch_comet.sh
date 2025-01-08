@@ -43,11 +43,7 @@ function sbatch_gpu_big() {
 
 
 
-sbatch_gpu_big "firstrun_train" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
-sbatch_gpu_big "confidence_human" "comet-train --cfg configs/experimental/earlyexit2_model_human.yaml"
-sbatch_gpu_big "confidence_last" "comet-train --cfg configs/experimental/earlyexit2_model_last.yaml"
-
-sbatch_gpu_short "firstrun_eval" "python3 experiments/05-score_comet.py"
-
-
-sbatch_gpu_short "eval_firstrun_da" "python3 experiments/07-evaluate_da_model.py lightning_logs/version_18089129/checkpoints/epoch=2-step=3552-val_kendall=0.035.ckpt"
+sbatch_gpu_big "train_helium" "comet-train --cfg configs/experimental/baseline_model.yaml"
+sbatch_gpu_big "train_hydrogen" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
+sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexit2_model_human.yaml"
+sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexit2_model_last.yaml"
