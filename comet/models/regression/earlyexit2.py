@@ -336,7 +336,7 @@ class EarlyExit2Regression(RegressionMetric):
         return Prediction(scores=output.score, confidences=output.confidence)
     
 
-    def predict_with_confidence(
+    def predict(
         self,
         samples: List[Dict[str, str]],
         batch_size: int = 16,
@@ -374,8 +374,6 @@ class EarlyExit2Regression(RegressionMetric):
                 by the model.
         """
         # NOTE: this function was copied from base.py and modified to also output the confidences
-
-        print("Running our predict")
 
         if mc_dropout > 0:
             self.set_mc_dropout(mc_dropout)
@@ -546,71 +544,3 @@ class EarlyExit2Regression(RegressionMetric):
 
         # confidence loss is less important
         return loss_value_score+0.5*loss_value_confidence
-
-    def predict(
-        self,
-        samples: List[Dict[str, str]],
-        batch_size: int = 16,
-        gpus: int = 1,
-        devices: Union[List[int], str, int] = None,
-        mc_dropout: int = 0,
-        progress_bar: bool = True,
-        accelerator: str = "auto",
-        num_workers: int = None,
-        length_batching: bool = True,
-    ) -> Prediction:
-        """
-        This is a stripped down version of the predict method of base.py without metadata and length batching but
-        with support for early exit model.
-        """
-        if mc_dropout > 0:
-            self.set_mc_dropout(mc_dropout)
-        assert gpus <= 1
-
-        if gpus > 0 and devices is not None:
-            assert len(devices) == gpus, AssertionError(
-                "List of devices must be same size as `gpus` or None if `gpus=0`"
-            )
-        elif gpus > 0:
-            devices = gpus
-        else: # gpu = 0
-            devices = "auto"
-        
-
-        self.eval()
-        dataloader = DataLoader(
-            dataset=samples,
-            batch_size=batch_size,
-            collate_fn=self.prepare_for_inference,
-            num_workers=2,
-            multiprocessing_context="fork" if torch.backends.mps.is_available() else None,
-        )
-        callbacks = []
-
-        if progress_bar:
-            enable_progress_bar = True
-            callbacks.append(PredictProgressBar())
-        else:
-            enable_progress_bar = False
-
-        warnings.filterwarnings(
-            "ignore",
-            category=UserWarning,
-            message=".*Consider increasing the value of the `num_workers` argument` .*",
-        )
-        trainer = ptl.Trainer(
-            devices=devices,
-            logger=False,
-            callbacks=callbacks,
-            accelerator=accelerator if gpus > 0 else "cpu",
-            strategy="auto" if gpus < 2 else "ddp",
-            enable_progress_bar=enable_progress_bar,
-        )
-        predictions = trainer.predict(
-            self, dataloaders=dataloader, return_predictions=True
-        )
-
-        scores = torch.cat([pred["scores"] for pred in predictions], dim=1).T.tolist()
-        output = Prediction(scores=scores, system_score=np.average(scores, axis=0))
-
-        return output

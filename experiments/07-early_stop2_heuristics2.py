@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import os
 os.chdir("/home/vilda/comet-early-exit")
 
-model = comet.load_from_checkpoint("lightning_logs/version_19245795/checkpoints/epoch=4-step=29320-val_avg_pearson=0.269.ckpt")
+model = comet.load_from_checkpoint("lightning_logs/beryllium/checkpoints/model.ckpt")
 data = random.Random(0).sample(list(csv.DictReader(open("data/csv/dev_da.csv", "r"))), k=1_000)
-output = model.predict_with_confidence(data, batch_size=32)
+output = model.predict(data, batch_size=32)
 pred_y = np.stack((output["scores"], output["confidences"]), axis=-1)
 data_y = [float(x["score"]) for x in data]
 
@@ -49,7 +49,6 @@ for threshold in [0.5, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
         pred_y_heuristics.append(pred)
         layer_heuristics.append(i)
     corr = scipy.stats.pearsonr(data_y, pred_y_heuristics).correlation
-    # print(f"Computation {(np.average(layer_heuristics)+1)/len(pred_y[0]):.1%}: corr={corr:.1%}")
     earylexit2_computation.append((np.average(layer_heuristics)+1)/len(pred_y[0]))
     earylexit2_corr.append(corr)
 
@@ -59,7 +58,6 @@ base_computation = []
 base_corr = []
 for i, preds in enumerate(pred_y.transpose(1, 0, 2)):
     corr = scipy.stats.pearsonr(data_y, preds[:,0]).correlation
-    print(f"Computation {(i+1)/len(pred_y[0]):.1%}: corr={corr:.1%}")
     base_computation.append((i+1)/len(pred_y[0]))
     base_corr.append(corr)
 
