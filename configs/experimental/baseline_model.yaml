@@ -9,8 +9,8 @@ referenceless_regression_metric:
     layerwise_decay: 0.95
     encoder_model: XLM-RoBERTa
     pretrained_model: xlm-roberta-large
-    pool: avg
-    layer: mix
+    pool: cls
+    layer: 24
     layer_transformation: sparsemax
     layer_norm: False
     loss: mse

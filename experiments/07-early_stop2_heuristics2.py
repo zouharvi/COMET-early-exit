@@ -61,7 +61,6 @@ for i, preds in enumerate(pred_y.transpose(1, 0, 2)):
     base_computation.append((i+1)/len(pred_y[0]))
     base_corr.append(corr)
 
-# %%
 plt.plot(base_computation, base_corr, label="fixed early exit")
 plt.plot(earylexit2_computation, earylexit2_corr, label="early exit with self-confidence")
 plt.xlabel("Computation")

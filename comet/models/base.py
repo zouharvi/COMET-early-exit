@@ -331,21 +331,17 @@ class CometModel(ptl.LightningModule, metaclass=abc.ABCMeta):
             embeddings = self.layerwise_attention(
                 encoder_out["all_layers"], attention_mask
             )
-
         elif self.hparams.layer >= 0 and self.hparams.layer < self.encoder.num_layers:
             embeddings = encoder_out["all_layers"][self.hparams.layer]
-
         else:
             raise Exception("Invalid model layer {}.".format(self.hparams.layer))
 
         if self.hparams.pool == "default":
             sentemb = encoder_out["sentemb"]
-
         elif self.hparams.pool == "max":
             sentemb = max_pooling(
                 input_ids, embeddings, self.encoder.tokenizer.pad_token_id
             )
-
         elif self.hparams.pool == "avg":
             sentemb = average_pooling(
                 input_ids,
@@ -355,10 +351,8 @@ class CometModel(ptl.LightningModule, metaclass=abc.ABCMeta):
                 self.encoder.tokenizer.sep_token_id, 
                 self.use_context,
             )
-
         elif self.hparams.pool == "cls":
             sentemb = embeddings[:, 0, :]
-
         else:
             raise Exception("Invalid pooling technique.")
 
