@@ -1,58 +1,52 @@
 import argparse
 import json
 import logging
-import os
-import sys
-
-import numpy as np
-
-# Logging format borrowed from Fairseq.
-logging.basicConfig(
-    stream=sys.stdout,
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S",
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s")
 
 from pathlib import Path
+from tqdm import tqdm
 
 import comet
 import h5py
+import numpy as np
 import torch
 
-from tqdm import tqdm
-from transformers import GenerationConfig
-
-from efficient_reranking.lib import datasets, generation, utils
+from efficient_reranking.lib import utils
 
 
 class MissingArgumentError(ValueError):
     pass
 
 def main(args):
-    torch.manual_seed(0)
+    torch.manual_seed(args.seed)
+
     work_dir = Path(args.work_dir) / args.split
     work_dir.mkdir(parents=True, exist_ok=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    logging.info(f"Evaluating candidates with COMET...")
 
     if args.comet_repo:
         comet_base_name = args.comet_repo.split("/")[-1]
         model_path = comet.download_model(args.comet_repo)
         model = comet.load_from_checkpoint(model_path).eval()
     elif args.comet_path:
-        comet_base_name = os.path.splitext(args.comet_path.split("/")[-1])[0]
+        comet_base_name = args.comet_path.split("/")[-3]
         model = comet.load_from_checkpoint(args.comet_path)
     else:
         raise MissingArgumentError("Must provide --comet_repo or --comet_path.")
 
-    output_path = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + ".h5")
+    if args.mc_dropout:
+        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + f"_dropout_{args.seed}.h5")
+    else:
+        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + ".h5")
+    output_path = output_path_base.with_suffix(".h5")
+
     if output_path.exists():
-        if args.overwrite:
-            logging.info(f"Output file {output_path} exists but overwriting.")
-        else:
-            logging.info(f"Output file {output_path} exists, aborting. Use --overwrite to overwrite.")
+        raise ValueError(f"Output file {output_path} already exists.")
+
+    # TODO (julius): This logs to stdout twice for some reason
+    utils.configure_logger("score_comet.py", output_path_base.with_suffix(".log"))
+
+    logging.info(f"Evaluating candidates with COMET...")
 
     candidates_path = work_dir / (utils.CANDIDATES_FILENAME + ".h5")
     data_path = Path(args.data_dir) / "jsonl" / f"{args.split}.jsonl"
@@ -76,18 +70,22 @@ def main(args):
         for i, data_line in enumerate(tqdm(data_lines)):
             if scores_h5ds[i, 0] and not args.overwrite:
                 continue
-            data_idxs.append(i)
             data = json.loads(data_line)
             src = data["src"]
             tgts = [candidates_text_h5ds[i, j].decode() for j in range(candidates_text_h5ds.shape[1])]
             # Skip missing candidates
             if all(not tgt for tgt in tgts):
                 continue
+            data_idxs.append(i)
             for tgt in tgts:
                 inputs.append({"src": src, "mt": tgt})
 
+        if not inputs:
+            return
         logging.info("Scoring...")
-        result = model.predict(samples=inputs, batch_size=args.comet_batch_size)
+        with torch.no_grad():
+            result = model.predict(samples=inputs, batch_size=args.comet_batch_size, mc_dropout=args.mc_dropout)
+        logging.info("Writing results to file...")
         scores = np.matrix(result.scores).reshape(-1, scores_h5ds.shape[1])
 
         for result_idx, data_idx in enumerate(data_idxs):
@@ -135,13 +133,13 @@ if __name__ == "__main__":
         "--comet_path", help="COMET model directory. Must pass --comet_repo or --comet_path")
 
     parser.add_argument(
-        "--overwrite", action="store_true", help="Overwrite existing data.")
-
-    parser.add_argument(
         "--seed", type=int, default=0, help="Random seed for PyTorch.")
 
     parser.add_argument(
         "--comet_batch_size", type=int, default=128, help="COMET batch size.")
+
+    parser.add_argument(
+        "--mc_dropout", action="store_true", help="Activate MC dropout.")
 
 
     args = parser.parse_args()
