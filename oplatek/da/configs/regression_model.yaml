@@ -1,0 +1,61 @@
+# runs few steps with the following command
+# comet-train --load_from_checkpoint /home/oplatek/.cache/huggingface/hub/models--Unbabel--wmt22-cometkiwi-da/snapshots/b3a8aea5a5f
+# c22db68a554b92b3d96eb6ea75cc9/checkpoints/model.ckpt --cfg da/configs/cometkiwi_finetuning.yaml
+unified_metric:
+  # class_path: comet.models.RegressionMetric
+  # class_path: comet.models.ReferencelessRegression
+  class_path: comet.models.UnifiedMetric
+  init_args:
+    # ORIGINAL wmt22-cometkiwi-da data
+    # train_data:
+    #   - data/1720-da.mlqe-src.csv
+    # validation_data:
+    #   - data/wmt-ende-newstest2021.csv
+    #   - data/wmt-enru-newstest2021.csv
+    #   - data/wmt-zhen-newstest2021.csv
+    train_data: 
+      - da/data/1720-da.mlqe.csv
+    validation_data: 
+      - da/data/2021-da.csv
+      # - da/data/2022-da.csv
+      # - da/data/2021-mqm.csv
+      # - da/data/2022-mqm.csv
+      # # TODO how to get these data
+      # - data/wmt-ende-newstest2021.csv
+      # - data/wmt-enru-newstest2021.csv
+      # - data/wmt-zhen-newstest2021.csv
+      #
+    activations: Tanh
+    batch_size: 4
+    dropout: 0.1
+    encoder_learning_rate: 1.0e-06
+    encoder_model: XLM-RoBERTa
+    final_activation: null
+    hidden_sizes:
+      - 3072
+      - 1024
+    input_segments:
+      - mt
+      - src
+    keep_embeddings_frozen: true
+    # layer: mix
+    # layer_norm: false
+    # layer_transformation: sparsemax
+    # layerwise_decay: 0.95
+    # learning_rate: 1.5e-05
+    # loss: mse
+    # loss_lambda: 0.65
+    # nr_frozen_epochs: 0.3
+    # optimizer: AdamW
+    # pool: avg
+    # pretrained_model: microsoft/infoxlm-large
+    # sent_layer: mix
+    # word_layer: 24
+    # word_level_training: false
+    # word_weights:
+    #   - 0.15
+    #   - 0.85
+    
+trainer: trainer.yaml
+early_stopping: early_stopping.yaml
+model_checkpoint: model_checkpoint.yaml
