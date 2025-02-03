@@ -47,3 +47,16 @@ sbatch_gpu_big "train_helium" "comet-train --cfg configs/experimental/baseline_m
 sbatch_gpu_big "train_hydrogen" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
 sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexitconf_model_human.yaml"
 sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
+
+sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/partial_model.yaml"
+
+
+tar -C lightning_logs/version_22504094/ -cf lightning_logs/model-helium.tar .
+tar -C lightning_logs/version_22504382/ -cf lightning_logs/model-hydrogen.tar .
+tar -C lightning_logs/version_22504386/ -cf lightning_logs/model-beryllium.tar .
+tar -C lightning_logs/version_22504384/ -cf lightning_logs/model-lithium.tar .
+
+rclone copy lightning_logs/model-helium.tar polybox:t/
+rclone copy lightning_logs/model-hydrogen.tar polybox:t/
+rclone copy lightning_logs/model-beryllium.tar polybox:t/
+rclone copy lightning_logs/model-lithium.tar polybox:t/
