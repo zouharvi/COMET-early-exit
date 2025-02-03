@@ -22,7 +22,7 @@ plt.fill_between(
     range(len(pred_y[0,:,0])),
     pred_y[0,:,0] - pred_y[0,:,1],
     pred_y[0,:,0] + pred_y[0,:,1],
-    alpha=0.5
+    alpha=0.5,
 )
 plt.legend()
 plt.xlabel("Layer")

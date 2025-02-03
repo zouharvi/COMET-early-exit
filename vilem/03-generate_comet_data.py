@@ -30,7 +30,8 @@ with open(args.data_out, "w") as f:
     writer.writeheader()
     writer.writerows(data_out)
 
-
-# python3 experiments/03-generate_comet_data.py data/jsonl/train.jsonl data/csv/train_da.csv
-# python3 experiments/03-generate_comet_data.py data/jsonl/test.jsonl data/csv/test_da.csv
-# python3 experiments/03-generate_comet_data.py data/jsonl/dev.jsonl data/csv/dev_da.csv
+"""
+python3 vilem/03-generate_comet_data.py data/jsonl/train.jsonl data/csv/train_da.csv
+python3 vilem/03-generate_comet_data.py data/jsonl/test.jsonl data/csv/test_da.csv
+python3 vilem/03-generate_comet_data.py data/jsonl/dev.jsonl data/csv/dev_da.csv
+"""

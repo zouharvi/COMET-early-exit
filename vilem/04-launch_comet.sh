@@ -45,5 +45,5 @@ function sbatch_gpu_big() {
 
 sbatch_gpu_big "train_helium" "comet-train --cfg configs/experimental/baseline_model.yaml"
 sbatch_gpu_big "train_hydrogen" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
-sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexit2_model_human.yaml"
-sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexit2_model_last.yaml"
+sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexitconf_model_human.yaml"
+sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
