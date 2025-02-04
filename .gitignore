@@ -171,8 +171,9 @@ cython_debug/
 
 models-*
 models-*/
-output
+output*
 output/*
 gen_all.sh
 run_job.sh
 models
+vilem/data*

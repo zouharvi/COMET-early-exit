@@ -9,6 +9,7 @@ from pathlib import Path
 import h5py
 from lib import utils
 import logging
+from copy import deepcopy
 
 
 def conditional_distr(mu, sigma, test_data, observed_mask):
@@ -111,10 +112,15 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
     mu_sigma = np.hstack([mu2[:,-1].reshape(-1,1), sigma2[:,-1].reshape(-1,1)])
     UCB_metrics = []
 
-    budget = num_ep * metric_costs[-1] - test_metrics.shape[0] * metric_costs[0]
+    original_budget = num_ep * metric_costs[-1] - test_metrics.shape[0] * metric_costs[0]
+    budget = deepcopy(original_budget)
 
+
+    candidate_cost = {i: [[metric_costs[0]], [0]] for i in range(test_metrics.shape[0] + 1)}
+    #candidate_cost = defaultdict(lambda: [[metric_costs[0]], [0]])
+
+    #breakpoint()
     while budget > 0:
-
         if args.candidate_selection == "UCB":
             UCB_candidate = get_UCB_candidate(mu_sigma, beta=beta)
         elif  args.candidate_selection == "exp_value_max":
@@ -126,17 +132,37 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
         
         # UCB_metric = i+1
         UCB_metric = which_UCB_metric(mu, sigma, test_metrics[UCB_candidate, :].reshape(1,-1), observed_mask[UCB_candidate, :].reshape(1,-1), metric_costs=metric_costs, metric_corrs=metric_corrs, cost_power=cost_power)
-        budget -= metric_costs[UCB_metric]
+        # breakpoint()
+        candidate_cost[UCB_candidate][0].append(metric_costs[UCB_metric])
+        candidate_cost[UCB_candidate][1].append(UCB_metric)
+
+        # sum costs so far but only take into account the last metric used
+        # the cost for calculating the last metric also inlclude the cost for previous metrics
+        budget = original_budget - sum(max(v[0]) for v in candidate_cost.values())
+
+        # budget -= metric_costs[UCB_metric]
 
         # if we run out of budget, we can try cheaper metrics still
         while budget < 0 and UCB_metric > 1:
-            budget += metric_costs[UCB_metric]
+            # ignore previously added things
+
+            candidate_cost[UCB_candidate][0] = candidate_cost[UCB_candidate][0][:-1]
+            candidate_cost[UCB_candidate][1] = candidate_cost[UCB_candidate][1][:-1]
+
+            # budget += sum(max(v[0]) for v in candidate_cost.values())
             UCB_metric -= 1
-            budget -= metric_costs[UCB_metric]
+            # add new metric and metric_cost
+            candidate_cost[UCB_candidate][0].append(metric_costs[UCB_metric])
+            candidate_cost[UCB_candidate][1].append(UCB_metric)
+
+            # budget -= metric_costs[UCB_metric]
+            # budget -= sum(max(v[0]) for v in candidate_cost.values())
+            budget = original_budget - sum(max(v[0]) for v in candidate_cost.values())
+
         # if even with the cheapest metric, we run out of budget, break
         if budget < 0:
             break
-        
+
 
         observed_mask[UCB_candidate,UCB_metric] = True
         UCB_metrics.append(UCB_metric)
@@ -374,8 +400,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
 
-    # python efficient_reranking/scripts/multivariate_gaussian_bandit.py vilem/scripts/data toy output wmt22-cometkiwi-da
-    # python efficient_reranking/scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium
-    # python efficient_reranking/scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium
-    # python efficient_reranking/scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium --candidate_selection exp_value_max
-    # python efficient_reranking/scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium --candidate_selection exp_value_max
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data toy output wmt22-cometkiwi-da
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium --candidate_selection exp_value_max
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium --candidate_selection exp_value_max
