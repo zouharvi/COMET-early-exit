@@ -1,8 +1,6 @@
 import argparse
 import json
 import collections
-import itertools
-import random
 import csv
 import numpy as np
 
@@ -15,7 +13,7 @@ data_train = [json.loads(line) for line in open("data/jsonl/train.jsonl")]
 fertility_train = collections.defaultdict(list)
 for line in data_train:
     fertility_train[line["langs"]].append(len(line["tgt"])/len(line["src"]))
-fertility_train = {l: np.average(v) for l,v in fertility_train.items()}
+fertility_train = collections.defaultdict(lambda: 1, {l: np.average(v) for l,v in fertility_train.items()})
 
 with open(args.data_in) as f:
     data = [json.loads(line) for line in f]
@@ -35,7 +33,7 @@ with open(args.data_out, "w") as f:
     writer.writerows(data_out)
 
 """
-python3 vilem/08-generate_comet_data_partial.py data/jsonl/train.jsonl data/csv/train_partial.csv
-python3 vilem/08-generate_comet_data_partial.py data/jsonl/test.jsonl data/csv/test_partial.csv
-python3 vilem/08-generate_comet_data_partial.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
+python3 vilem/08-generate_data_partial.py data/jsonl/train.jsonl data/csv/train_partial.csv
+python3 vilem/08-generate_data_partial.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
+python3 vilem/08-generate_data_partial.py data/jsonl/test.jsonl data/csv/test_partial.csv
 """
