@@ -177,3 +177,5 @@ gen_all.sh
 run_job.sh
 models
 vilem/data*
+vilem/scripts/data*
+z_outputs
