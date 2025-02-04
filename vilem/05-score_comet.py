@@ -42,5 +42,5 @@ sbatch_gpu_short "eval_beryllium" "python3 ../COMET-early-exit-experiments/vilem
 
 sbatch_gpu_short "eval_hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05-score_comet.py 'lightning_logs/version_22504382/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
 
-sbatch_gpu_short "eval_helium_to_hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05-score_comet.py 'lightning_logs/helium_to_hydrogen/checkpoints/epoch4.ckpt'"
+sbatch_gpu_short "eval_helium2hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05-score_comet.py 'lightning_logs/helium2hydrogen/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt'"
 """
