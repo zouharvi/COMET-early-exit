@@ -11,7 +11,7 @@ from lib import utils
 import logging
 
 
-def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=None):
+def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=None, norm_confidences=False):
 
     num_samples = test_data.shape[0]
     num_columns = test_data.shape[1]
@@ -61,7 +61,8 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
 
             # here is the uncertainty for each score added to the Cov
             error_pred = test_confs[index][:num_observed_columns]# uncertainty is | score - target |
-            error_pred = error_pred * np.sqrt(np.pi/2)
+            if norm_confidences:
+                error_pred = error_pred * np.sqrt(np.pi/2)
             x_1_var = np.diag(error_pred **2 ) 
             sigma_22_given_x1 = sigma_22_given_x1_all  + np.matmul(np.matmul(sigma_21, sigma_11_inv), np.matmul(x_1_var, np.matmul(sigma_11_inv, sigma_12)))
             stdev = np.sqrt(sigma_22_given_x1[-1,-1]) 
@@ -84,13 +85,13 @@ def calculate_confidences(mu_sigma, alpha: float = 0.95):
 
     return confidence > norm.ppf(alpha) # if true drop it later
 
-def do_loop(test_metrics, mu, sigma, test_confs=None, alpha=0.95):
+def do_loop(test_metrics, mu, sigma, test_confs=None, alpha=0.95, norm_confidences=False):
     
     original_indices = np.arange(len(test_metrics))
     drop_dict = {}
 
     for i in range(len(test_metrics.T)-1): 
-        mu_sigma = conditional_distr(mu, sigma, test_metrics, i+1, test_confs=test_confs)
+        mu_sigma = conditional_distr(mu, sigma, test_metrics, i+1, test_confs=test_confs, norm_confidences=norm_confidences)
         drop_flags = calculate_confidences(mu_sigma, alpha=alpha)
         test_metrics = test_metrics[~drop_flags]
         drop_dict[i] = test_metrics.shape[0]
@@ -173,7 +174,10 @@ def main(args):
     work_dir = Path(args.work_dir) / args.split
     work_dir.mkdir(parents=True, exist_ok=True)
     if use_confidences:
-        output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results_with_error_pred"
+        if args.norm_confidences:
+            output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results_with_error_pred_norm"
+        else:
+            output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results_with_error_pred"
     else:
         output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results"
     
@@ -208,7 +212,7 @@ def main(args):
 
         for a in args.alphas:
             test_conf = test_confs[test_idx] if test_confs is not None else None
-            winner, drop_dict = do_loop(test_score, mu_train, sigma_train, test_confs=test_conf, alpha=a,)
+            winner, drop_dict = do_loop(test_score, mu_train, sigma_train, test_confs=test_conf, alpha=a, norm_confidences=args.norm_confidences)
             winner_comets[a] += np.max(test_score.T[-1][winner])
             drop_dicts[a].append(drop_dict)
             if len(winner) == test_score.shape[0]:
@@ -252,10 +256,13 @@ if __name__ == "__main__":
                          "Will be created if doesn't exist.")
     
     parser.add_argument("model_class_name",
-                        help="Name of the model class, e.g. 'quern', 'skintle'." )
+                        help="Name of the model class, e.g. 'hydrogen', 'lithium'." )
 
     parser.add_argument(
-        "--use_confidences", action="store_true", help="Incorporate a models error prediction.")
+        "--use_confidences", action="store_true", help="Incorporate a model's error prediction.")
+    
+    parser.add_argument(
+        "--norm_confidences", action="store_true", help="Normalize a model's error prediction.")
 
     parser.add_argument(
         "--alphas",
@@ -269,11 +276,15 @@ if __name__ == "__main__":
     main(args)
 
 
-# python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data dev output wmt22-cometkiwi-da
-# python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data dev output models-hydrogen
-# python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium
-# python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium
-# python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data dev output models-helium
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output wmt22-cometkiwi-da
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-hydrogen
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium --use_confidences
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium --use_confidences --norm_confidences
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium --use_confidences
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium --use_confidences --norm_confidences
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-helium
 
 
 

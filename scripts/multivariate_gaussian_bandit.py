@@ -112,7 +112,7 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
     mu_sigma = np.hstack([mu2[:,-1].reshape(-1,1), sigma2[:,-1].reshape(-1,1)])
     UCB_metrics = []
 
-    original_budget = num_ep * metric_costs[-1] - test_metrics.shape[0] * metric_costs[0]
+    original_budget = num_ep * metric_costs[-1] #- test_metrics.shape[0] * metric_costs[0]
     budget = deepcopy(original_budget)
 
 
@@ -121,6 +121,7 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
 
     #breakpoint()
     while budget > 0:
+
         if args.candidate_selection == "UCB":
             UCB_candidate = get_UCB_candidate(mu_sigma, beta=beta)
         elif  args.candidate_selection == "exp_value_max":
@@ -140,25 +141,24 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
         # the cost for calculating the last metric also inlclude the cost for previous metrics
         budget = original_budget - sum(max(v[0]) for v in candidate_cost.values())
 
-        # budget -= metric_costs[UCB_metric]
-
         # if we run out of budget, we can try cheaper metrics still
         while budget < 0 and UCB_metric > 1:
-            # ignore previously added things
 
+            # ignore previously added things
             candidate_cost[UCB_candidate][0] = candidate_cost[UCB_candidate][0][:-1]
             candidate_cost[UCB_candidate][1] = candidate_cost[UCB_candidate][1][:-1]
 
-            # budget += sum(max(v[0]) for v in candidate_cost.values())
+            # try next cheaper metric
             UCB_metric -= 1
-            # add new metric and metric_cost
+            # if we already have calculated this metric, don't need to do again
+            if UCB_metric == candidate_cost[UCB_candidate][1][-1]:
+                break
+
+            # add new metric and metric_cost and re-calculate budget
             candidate_cost[UCB_candidate][0].append(metric_costs[UCB_metric])
             candidate_cost[UCB_candidate][1].append(UCB_metric)
-
-            # budget -= metric_costs[UCB_metric]
-            # budget -= sum(max(v[0]) for v in candidate_cost.values())
             budget = original_budget - sum(max(v[0]) for v in candidate_cost.values())
-
+            
         # if even with the cheapest metric, we run out of budget, break
         if budget < 0:
             break
@@ -174,15 +174,14 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
 
     
     winner =  np.argmax((mu2*observed_mask)[:,-1])
+
+    breakpoint()
     return winner, UCB_metrics
 
 
 def read_data(args, use_confidences):
 
-
-    # with h5py.File((Path(args.work_dir) / split / utils.CANDIDATES_FILENAME).with_suffix(".h5")) as h5_file:
     h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}.h5"
-
     f = h5py.File(h5_filename, 'r')
 
     # sort layers and skip first one
@@ -272,8 +271,12 @@ def main(args):
     num_metrics = mu_train.shape[0]
     metric_costs =  [i / num_metrics for i in range(1, num_metrics + 1)]
 
-    
-    metirc_corrs = metric_costs # for now set it to metric costs but actual corrs would be better
+    try:
+        metric_corrs = utils.CORRELATIONS_WITH_LAST_LAYER[args.model_class_name]
+    except KeyError:
+        raise KeyError(f"{args.model_class_name} has no correlations added yet! :(")
+    assert len(metric_corrs) == len(metric_costs)
+    metric_corrs = metric_costs # for now set it to metric costs but actual corrs would be better
     if args.candidate_selection != "UCB": args.betas = [0] # if not UCB beta is not relevant
 
     for beta in args.betas:
@@ -310,7 +313,8 @@ def main(args):
                     random_comets[budget_cand] += orig_test[random_cand][-1]
 
 
-                    winner, ucb_metrics_list_i = do_loop(orig_test, mu_train, sigma_train, num_ep=num_ep, metric_costs=metric_costs, metric_corrs=metirc_corrs, cost_power=cost_power, beta=beta)
+                    winner, ucb_metrics_list_i = do_loop(orig_test, mu_train, sigma_train, num_ep=num_ep, metric_costs=metric_costs, metric_corrs=metric_corrs, cost_power=cost_power, beta=beta)
+                    breakpoint()
                     winner_comets[budget_cand] += orig_test.T[-1][winner]
 
                     for m, count in Counter(ucb_metrics_list_i).items():
@@ -400,8 +404,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
 
-    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data toy output wmt22-cometkiwi-da
-    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-hydrogen
     # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium
-    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-helium --candidate_selection exp_value_max
+    # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-hydrogen --candidate_selection exp_value_max
     # python scripts/multivariate_gaussian_bandit.py vilem/scripts/data dev output models-beryllium --candidate_selection exp_value_max
