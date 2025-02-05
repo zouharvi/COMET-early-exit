@@ -80,6 +80,7 @@ sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/exper
 sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
 sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/partial_model.yaml"
 sbatch_gpu_big "train_carbon" "comet-train --cfg configs/experimental/partial_model.yaml"
+sbatch_gpu_big "train_nitrogen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last.yaml"
 
 
 # remove all but last checkpoint
