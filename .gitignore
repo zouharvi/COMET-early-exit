@@ -1,6 +1,7 @@
 data/
-lightning_logs
-computed
+lightning_logs/
+computed/
+figures/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
