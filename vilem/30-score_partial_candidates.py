@@ -2,6 +2,7 @@ import comet
 import scipy.stats
 import json
 from utils import FERTILITY
+import utils_candidates
 
 data_orig = [json.loads(line) for line in open("data/jsonl/test.jsonl")]
 
@@ -28,14 +29,8 @@ for model_name, model in [
 ]:
     for p in [0.25, 0.50, 0.75, 10.00]:
         data = data_all[p]
-        data_m_d = model.predict(data, batch_size=64)["scores"]
-        print(
-            f"Correlation model={model_name} data={p:.0%}",
-            f'{scipy.stats.pearsonr(data_m_d, [float(x["score"]) for x in data]).correlation:.3f}',
-        )
+        data_m_d = model.predict(data, batch_size=128)["scores"]
 
 """
-sbatch_gpu_big_short "eval_partial" "python3 ../COMET-early-exit-experiments/vilem/09-eval_partial_comet.py"
-sbatch_gpu_big_short "eval_partial_carbon" "python3 ../COMET-early-exit-experiments/vilem/09-eval_partial_comet.py"
-sbatch_gpu_big_short "eval_partial_10x" "python3 ../COMET-early-exit-experiments/vilem/09-eval_partial_comet.py"
+sbatch_gpu_big_short "score_candidates_partial" "python3 ../COMET-early-exit-experiments/vilem/09-eval_partial_comet.py"
 """

@@ -4,6 +4,7 @@ import collections
 import csv
 import numpy as np
 import random
+from utils import FERTILITY
 
 r_len = random.Random(0)
 
@@ -11,12 +12,6 @@ args = argparse.ArgumentParser()
 args.add_argument("data_in")
 args.add_argument("data_out")
 args = args.parse_args()
-
-data_train = [json.loads(line) for line in open("data/jsonl/train.jsonl")]
-fertility_train = collections.defaultdict(list)
-for line in data_train:
-    fertility_train[line["langs"]].append(len(line["tgt"])/len(line["src"]))
-fertility_train = collections.defaultdict(lambda: 1, {l: np.average(v) for l,v in fertility_train.items()})
 
 
 with open(args.data_in) as f:
@@ -26,7 +21,7 @@ data_out = []
 for line in data:
     data_out.append({
         "src": line["src"],
-        "mt": line["tgt"][:int(r_len.choice([0.25, 0.50, 0.75, 1.00])*fertility_train[line["langs"]]*len(line["src"]))],
+        "mt": line["tgt"][:int(r_len.choice([0.25, 0.50, 0.75, 1.00])*FERTILITY[line["langs"]]*len(line["src"]))],
         "score": line["score"],
     })
 

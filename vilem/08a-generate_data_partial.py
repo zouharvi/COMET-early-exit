@@ -1,19 +1,12 @@
 import argparse
 import json
-import collections
 import csv
-import numpy as np
+from utils import FERTILITY
 
 args = argparse.ArgumentParser()
 args.add_argument("data_in")
 args.add_argument("data_out")
 args = args.parse_args()
-
-data_train = [json.loads(line) for line in open("data/jsonl/train.jsonl")]
-fertility_train = collections.defaultdict(list)
-for line in data_train:
-    fertility_train[line["langs"]].append(len(line["tgt"])/len(line["src"]))
-fertility_train = collections.defaultdict(lambda: 1, {l: np.average(v) for l,v in fertility_train.items()})
 
 with open(args.data_in) as f:
     data = [json.loads(line) for line in f]
@@ -22,7 +15,7 @@ data_out = []
 for line in data:
     data_out.append({
         "src": line["src"],
-        "mt": line["tgt"][:int(fertility_train[line["langs"]]*len(line["src"])/2)],
+        "mt": line["tgt"][:int(FERTILITY[line["langs"]]*len(line["src"])/2)],
         "score": line["score"],
     })
 

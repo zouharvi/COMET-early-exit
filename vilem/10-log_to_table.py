@@ -32,3 +32,4 @@ def print_table(fname):
 
 print_table("../computed/eval_beryllium.json")
 print_table("../computed/eval_helium2hydrogen.json")
+print_table("../computed/eval_nitrogen.json")

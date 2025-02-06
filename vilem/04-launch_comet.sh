@@ -80,11 +80,12 @@ sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/exper
 sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
 sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/partial_model.yaml"
 sbatch_gpu_big "train_carbon" "comet-train --cfg configs/experimental/partial_model.yaml"
-sbatch_gpu_big "train_nitrogen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last.yaml"
+sbatch_gpu_big "train_nitrogen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last_old.yaml"
+sbatch_gpu_bigg "train_oxygen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last.yaml"
 
 
 # remove all but last checkpoint
-ls lightning_logs/version_*/checkpoints/epoch\={0,1,2,3}*.ckpt
+ls lightning_logs/version_*/checkpoints/epoch\={0,1,2,3}*.ckpt  
 rm lightning_logs/version_*/checkpoints/epoch\={0,1,2,3}*.ckpt
 
 tar -C lightning_logs/version_22504094/ -cf lightning_logs/model-helium.tar .
@@ -93,7 +94,7 @@ tar -C lightning_logs/version_22504384/ -cf lightning_logs/model-lithium.tar .
 tar -C lightning_logs/version_22504386/ -cf lightning_logs/model-beryllium.tar .
 tar -C lightning_logs/version_22525419/ -cf lightning_logs/model-boron.tar .
 tar -C lightning_logs/helium2hydrogen/ -cf lightning_logs/model-helium2hydrogen.tar .
-
+tar -C lightning_logs/version_22525421/ -cf lightning_logs/model-carbon.tar .
 
 rclone copy lightning_logs/model-helium.tar polybox:t/
 rclone copy lightning_logs/model-hydrogen.tar polybox:t/
@@ -101,3 +102,4 @@ rclone copy lightning_logs/model-lithium.tar polybox:t/
 rclone copy lightning_logs/model-beryllium.tar polybox:t/
 rclone copy lightning_logs/model-boron.tar polybox:t/
 rclone copy lightning_logs/model-helium2hydrogen.tar polybox:t/
+rclone copy lightning_logs/model-carbon.tar polybox:t/
