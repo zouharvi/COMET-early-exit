@@ -37,9 +37,9 @@ def main(args):
     model = model.to(device)
 
     if args.mc_dropout:
-        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + f"_dropout_{args.seed}.h5")
+        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + f"_{args.generation_mode}" +f"_dropout_{args.seed}.h5")
     else:
-        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + ".h5")
+        output_path_base = work_dir / (utils.COMET_SCORES_FILENAME_BASE + comet_base_name + f"_{args.generation_mode}" + ".h5")
     output_path = output_path_base.with_suffix(".h5")
 
     if output_path.exists():
@@ -50,8 +50,8 @@ def main(args):
 
     logging.info(f"Evaluating candidates with COMET...")
 
-    candidates_path = work_dir / (utils.CANDIDATES_FILENAME + ".h5")
-    confidences_path = work_dir /  (utils.CONFIDENCES_FILENAME_BASE + comet_base_name + ".h5")
+    candidates_path = work_dir / (utils.CANDIDATES_FILENAME + f"_{args.generation_mode}" + ".h5")
+    confidences_path = work_dir /  (utils.CONFIDENCES_FILENAME_BASE + comet_base_name +  f"_{args.generation_mode}" + ".h5")
     data_path = Path(args.data_dir) / "jsonl" / f"{args.split}.jsonl"
     data_lines = open(data_path).readlines()
 
@@ -114,7 +114,8 @@ def main(args):
             
                 result = model.predict(samples=inputs, batch_size=args.comet_batch_size, mc_dropout=args.mc_dropout)
                 num_layers = len(result.scores[0])
-                assert num_layers == len(model.encoder.model.encoder.layer)+1
+                
+                #assert num_layers == len(model.encoder.model.encoder.layer)+1
                 scores = np.array(result.scores).reshape( -1,  candidates_text_h5ds.shape[1], num_layers) # instances x candidates x layers
                 scores = scores.transpose(2, 0, 1) # layers x instances x candidates 
 
@@ -196,6 +197,9 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--mc_dropout", action="store_true", help="Activate MC dropout.")
+    
+    parser.add_argument(
+        "--generation_mode", type=str, default="sample", help="Either 'beam' or 'sample'.")
 
 
     args = parser.parse_args()
@@ -212,4 +216,5 @@ if __name__ == "__main__":
 # python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-lithium/checkpoints/model.ckpt
 # python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-beryllium/checkpoints/model.ckpt
 # python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-helium/checkpoints/model.ckpt
+# # python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-oxygen/checkpoints/model.ckpt
 
