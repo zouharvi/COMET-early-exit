@@ -4,9 +4,9 @@ import json
 
 def get_data():
     data_out = []
-    with h5py.File("../data/candidates/beam_dev.h5") as candidates_file:
+    with h5py.File("data/candidates/beam_dev.h5") as candidates_file:
         candidates_text_h5ds = candidates_file["text"]
-        data_lines = open("../data/jsonl/dev.jsonl").readlines()
+        data_lines = open("data/candidates/dev.jsonl").readlines()
 
         assert candidates_text_h5ds.shape[0] == len(data_lines)
 
@@ -21,9 +21,8 @@ def get_data():
             
             data_out.append({
                 "src": src,
-                "tgt": tgts,
+                "tgts": tgts,
                 "langs": data["langs"],
-                "score": data["score"],
             })
     
     return data_out

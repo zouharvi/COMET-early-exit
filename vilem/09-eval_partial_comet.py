@@ -5,7 +5,7 @@ from utils import FERTILITY
 
 data_orig = [json.loads(line) for line in open("data/jsonl/test.jsonl")]
 
-model_orig = comet.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
+model_helium = comet.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
 model_carbon = comet.load_from_checkpoint("lightning_logs/version_22525421/checkpoints/epoch=4-step=29320-val_pearson=0.380.ckpt")
 
 data_all = {
@@ -23,7 +23,7 @@ data_all = {
 # NOTE: use 1_000% (10x) to make sure the whole translation is in
 
 for model_name, model in [
-    ("helium", model_orig),
+    ("helium", model_helium),
     ("carbon", model_carbon),
 ]:
     for p in [0.25, 0.50, 0.75, 10.00]:
