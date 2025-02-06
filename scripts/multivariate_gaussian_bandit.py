@@ -84,23 +84,32 @@ def get_candidate(mu_sigma, test_metrics):
     return np.argmax(payoff)
 
 def which_UCB_metric(mu, sigma, test_data_x, observed_mask_x, metric_costs, metric_corrs, cost_power):
+    observed_cost = (observed_mask_x * metric_costs).max()
+    marginal_metric_costs = metric_costs - observed_cost
+    metric_costs = marginal_metric_costs
+
     assert observed_mask_x[0,-1] != True, "Last metric already observed!"
     prior_mu, prior_sigma = conditional_distr(mu, sigma, test_data_x, observed_mask_x)
     prior_mu_sigma = np.hstack([prior_mu[:,-1].reshape(-1,1), prior_sigma[:,-1].reshape(-1,1)])
     prior_std = np.sqrt(prior_mu_sigma[0,1])
     max_reward_margin = 0
     argmax_reward_margin = -1
-    for m in range(1, observed_mask_x.shape[1], 1):
+
+    best_observed_metric =  np.where(observed_mask_x[0])[0][-1]
+    for m in range(best_observed_metric, observed_mask_x.shape[1], 1):
         if not observed_mask_x[0,m]:
             observed_mask_x[0,m] = True
             new_mu, new_sigma = conditional_distr(mu, sigma, test_data_x, observed_mask_x)
+            #breakpoint()
             new_mu_sigma = np.hstack([new_mu[:,-1].reshape(-1,1), new_sigma[:,-1].reshape(-1,1)])
             new_std = np.sqrt(new_mu_sigma[0,1])
             reward_margin = (prior_std - new_std) / metric_costs[m]**cost_power
+            #print(m, reward_margin, prior_std - new_std, new_std)
             if reward_margin > max_reward_margin:
                 max_reward_margin = reward_margin
                 argmax_reward_margin = m
             observed_mask_x[0,m] = False
+
     return argmax_reward_margin
 
 def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_power, beta):
@@ -132,6 +141,7 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
             raise NotImplementedError
         
         # UCB_metric = i+1
+        #breakpoint()
         UCB_metric = which_UCB_metric(mu, sigma, test_metrics[UCB_candidate, :].reshape(1,-1), observed_mask[UCB_candidate, :].reshape(1,-1), metric_costs=metric_costs, metric_corrs=metric_corrs, cost_power=cost_power)
         # breakpoint()
         candidate_cost[UCB_candidate][0].append(metric_costs[UCB_metric])
@@ -175,8 +185,14 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
     
     winner =  np.argmax((mu2*observed_mask)[:,-1])
 
-    breakpoint()
-    return winner, UCB_metrics
+    final_UCB_metrics = [max(v[1]) for v in candidate_cost.values() if max(v[1]) != 0]
+
+    layers_run = (observed_mask.shape[1] - 1) - np.argmax(observed_mask[:, ::-1], axis=1)
+    # first layer is run for all and is already included
+    layers_run = layers_run[layers_run != 0]
+    if  np.all(final_UCB_metrics == layers_run) == False:
+        breakpoint()
+    return winner, layers_run
 
 
 def read_data(args, use_confidences):
@@ -296,8 +312,10 @@ def main(args):
                 
                 for orig_test in tqdm(test_scores,total=len(test_scores)):
 
+                    #breakpoint()
 
-                    orig_test[:,0] = np.random.random(orig_test[:,0].shape)
+
+                    # orig_test[:,0] = np.random.random(orig_test[:,0].shape)
 
                     best = np.argmax(orig_test.T[-1])
                     best_comets[budget_cand] += np.max(orig_test.T[-1])
@@ -314,7 +332,7 @@ def main(args):
 
 
                     winner, ucb_metrics_list_i = do_loop(orig_test, mu_train, sigma_train, num_ep=num_ep, metric_costs=metric_costs, metric_corrs=metric_corrs, cost_power=cost_power, beta=beta)
-                    breakpoint()
+                    
                     winner_comets[budget_cand] += orig_test.T[-1][winner]
 
                     for m, count in Counter(ucb_metrics_list_i).items():
@@ -395,7 +413,7 @@ if __name__ == "__main__":
         "--budget_cands",
         type=int,
         nargs='+',
-        default=[10,  50, 100, 150],
+        default=[10,  50, 100],
         help="List of beta values (default: [10,50, 100])"
     )
 

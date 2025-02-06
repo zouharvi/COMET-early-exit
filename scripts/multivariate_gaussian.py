@@ -25,14 +25,24 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
 
     mu_1  = mu[:num_observed_columns,:]
     mu_2  = mu[num_observed_columns:,:] 
-
+    
+    # original assignment
     sigma_11 = sigma[:num_observed_columns, :num_observed_columns] # between observed variables
     sigma_12 = sigma[:num_observed_columns, num_observed_columns:]
     sigma_21 = sigma[num_observed_columns:, :num_observed_columns]
     sigma_22 = sigma[num_observed_columns:, num_observed_columns:] # between unobserved variables
     
+    ###################################
+    # mu_1  = mu[num_observed_columns-1:num_observed_columns,:]
+    # mu_2  = mu[num_observed_columns:,:] 
+    # sigma_11 = sigma[num_observed_columns -1 :num_observed_columns, num_observed_columns-1:num_observed_columns]
+    # sigma_12 = sigma[num_observed_columns-1:num_observed_columns, num_observed_columns:]
+    # sigma_21 = sigma_12.transpose()
+    ####################################
+
+
     # calculate cond. distribution
-    sigma_11_inv     = np.linalg.inv(sigma_11)
+    sigma_11_inv  = np.linalg.inv(sigma_11)
 
     if test_confs is None:
         sigma_22_given_x1 = sigma_22 - np.matmul(sigma_21, np.matmul(sigma_11_inv, sigma_12))
@@ -43,30 +53,50 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
         for x in test_data:
 
             x_1 = x[:num_observed_columns]
-
+            #######################
+            # x_1 = x[num_observed_columns-1:num_observed_columns]
+            #######################
             mu_2_given_x1_1 = mu_2 + np.matmul(sigma_21, np.matmul(sigma_11_inv, (x_1.reshape(-1,1) - mu_1)))
             mu_2_given_x1.append(mu_2_given_x1_1[-1,0])
         return np.hstack([np.array(mu_2_given_x1).reshape(-1,1), np.ones_like(test_data[:,-1:])*stdev])
     
     else:
-
-        sigma_22_given_x1_all = sigma_22 - np.matmul(sigma_21, np.matmul(sigma_11_inv, sigma_12))    
+        #breakpoint()
+        sigma_22_given_x1_all = sigma_22 - np.matmul(sigma_21, np.matmul(sigma_11_inv, sigma_12))  #22x1 x 1x22  
         
         mu_2_given_x1 = []
         std_devs = []
         for index, x in enumerate(test_data): 
+            
             x_1 = x[:num_observed_columns] # (1, num_observed_columns)
+
+            #######################
+            # x_1 = x[num_observed_columns-1:num_observed_columns]
+            #######################
+
             mu_2_given_x1_1 = mu_2 + np.matmul(sigma_21, np.matmul(sigma_11_inv, (x_1.reshape(-1,1) - mu_1)))
+
             mu_2_given_x1.append(mu_2_given_x1_1[-1,0])
 
-            # here is the uncertainty for each score added to the Cov
-            error_pred = test_confs[index][:num_observed_columns]# uncertainty is | score - target |
+            # # here is the uncertainty for each score added to the Cov
+            error_pred = test_confs[index][:num_observed_columns]   # uncertainty is | score - target |
+            #################
+            # error_pred = test_confs[index][num_observed_columns-1:num_observed_columns]   # uncertainty is | score - target |
+            ###################
+            # breakpoint()
+
             if norm_confidences:
-                error_pred = error_pred * np.sqrt(np.pi/2)
+                error_pred = error_pred * np.sqrt(np.pi/2) # go from absolute error to mean squared error
             x_1_var = np.diag(error_pred **2 ) 
+            
             sigma_22_given_x1 = sigma_22_given_x1_all  + np.matmul(np.matmul(sigma_21, sigma_11_inv), np.matmul(x_1_var, np.matmul(sigma_11_inv, sigma_12)))
+
             stdev = np.sqrt(sigma_22_given_x1[-1,-1]) 
             std_devs.append(stdev)
+
+            # breakpoint()
+
+            #std_devs.append(error_pred[0])
 
         std_devs = np.vstack(std_devs)
 
@@ -81,29 +111,33 @@ def calculate_confidences(mu_sigma, alpha: float = 0.95):
     mu, sigma = mu_sigma[:,0], mu_sigma[0,1]
     mu_max = np.max(mu)
     confidence = (mu_max - mu) / (sigma)
-
-
     return confidence > norm.ppf(alpha) # if true drop it later
 
 def do_loop(test_metrics, mu, sigma, test_confs=None, alpha=0.95, norm_confidences=False):
     
     original_indices = np.arange(len(test_metrics))
     drop_dict = {}
-
+    
     for i in range(len(test_metrics.T)-1): 
         mu_sigma = conditional_distr(mu, sigma, test_metrics, i+1, test_confs=test_confs, norm_confidences=norm_confidences)
         drop_flags = calculate_confidences(mu_sigma, alpha=alpha)
+        # print("TEST METRICS", test_metrics)
+        # print("DROP FLAGS", drop_flags)
+        
         test_metrics = test_metrics[~drop_flags]
+        # print("TEST METRICS", test_metrics)
+        # print("Test metric", i)
+        # print("______________")
         drop_dict[i] = test_metrics.shape[0]
         original_indices = original_indices[~drop_flags]
     return original_indices, drop_dict
 
 
-def read_data(args, use_confidences):
+def read_data(args, model_class_name, use_confidences):
 
 
     # with h5py.File((Path(args.work_dir) / split / utils.CANDIDATES_FILENAME).with_suffix(".h5")) as h5_file:
-    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}.h5"
+    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{model_class_name}.h5"
 
     f = h5py.File(h5_filename, 'r')
 
@@ -114,7 +148,7 @@ def read_data(args, use_confidences):
     f.close()
 
     if use_confidences:
-        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{args.model_class_name}.h5"
+        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{model_class_name}.h5"
         f_conf = h5py.File(h5_filename_confidences, 'r')
 
         # sort layers and skip first one
@@ -183,7 +217,8 @@ def main(args):
     
     utils.configure_logger("multivariate_gaussian.py", output_path_base.with_suffix(".log"))
     logging.info("Reading data")
-    train_scores, test_scores, test_confs = read_data(args, use_confidences=use_confidences)
+    train_scores, test_scores, test_confs = read_data(args, model_class_name=args.model_class_name, use_confidences=use_confidences)
+    #_, baseline_test_scores, _ = read_data(args, model_class_name=args.baseline_model, use_confidences=use_confidences)
 
     logging.info("Prepairing train data")
     train_scores = np.vstack(train_scores)
@@ -195,6 +230,7 @@ def main(args):
     best_comets = 0
     random_comets = 0
     winner_comets = defaultdict(float)
+    winner_comets_baseline = defaultdict(float) 
     correct_ex = defaultdict(float)
     not_dropped = defaultdict(float)
     num_candidates = []
@@ -212,8 +248,10 @@ def main(args):
 
         for a in args.alphas:
             test_conf = test_confs[test_idx] if test_confs is not None else None
+            
             winner, drop_dict = do_loop(test_score, mu_train, sigma_train, test_confs=test_conf, alpha=a, norm_confidences=args.norm_confidences)
             winner_comets[a] += np.max(test_score.T[-1][winner])
+            #winner_comets_baseline[a] += np.max(baseline_test_scores[test_idx].T[-1][winner])
             drop_dicts[a].append(drop_dict)
             if len(winner) == test_score.shape[0]:
                 not_dropped[a] +=1
@@ -230,6 +268,7 @@ def main(args):
     for a in args.alphas:
         results_dict["Alpha"].append(a)
         results_dict["Pruned avg COMET score"].append(winner_comets[a]/num_samples)
+        #results_dict["Pruned avg COMETKiwi score"].append(winner_comets_baseline[a]/num_samples)
         for key, value in average_dicts(drop_dicts[a]).items():
             results_dict[f"Avg. candidates left after observing score {key+1}"].append(value)
         results_dict["Correct Examples:"].append(correct_ex[a]/num_samples)
@@ -243,6 +282,10 @@ def main(args):
 
 
 if __name__ == "__main__":
+    #alphas = [round(x, 2) for x in list(np.arange(0.98, 0.6, -0.02))]
+
+    alphas = [round(x, 2) for x in list(np.arange(0.98, 0.5, -0.05))]
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -258,6 +301,13 @@ if __name__ == "__main__":
     parser.add_argument("model_class_name",
                         help="Name of the model class, e.g. 'hydrogen', 'lithium'." )
 
+    # parser.add_argument(
+    #     "baseline_model",
+    #     nargs="?",
+    #     default="wmt22-cometkiwi-da",  # Set the default value
+    #     help="Name of the model class, usually CometKiwi."
+    # )
+
     parser.add_argument(
         "--use_confidences", action="store_true", help="Incorporate a model's error prediction.")
     
@@ -268,7 +318,7 @@ if __name__ == "__main__":
         "--alphas",
         type=float,
         nargs='+',
-        default=[0.95, 0.9, 0.8, 0.7, 0.6],
+        default=[0.999, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6],
         help="List of alpha values (default: [0.95, 0.9, 0.8, 0.7, 0.6])"
     )
 
