@@ -181,7 +181,10 @@ def do_loop(test_metrics, mu, sigma, num_ep, metric_costs, metric_corrs, cost_po
 
 def read_data(args, use_confidences):
 
-    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}.h5"
+
+
+    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}_{args.generation_mode}.h5"
+
     f = h5py.File(h5_filename, 'r')
 
     # sort layers and skip first one
@@ -191,7 +194,7 @@ def read_data(args, use_confidences):
     f.close()
 
     if use_confidences:
-        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{args.model_class_name}.h5"
+        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{args.model_class_name}_{args.generation_mode}.h5"
         f_conf = h5py.File(h5_filename_confidences, 'r')
 
         # sort layers and skip first one
@@ -399,7 +402,8 @@ if __name__ == "__main__":
         help="List of beta values (default: [10,50, 100])"
     )
 
-
+    parser.add_argument(
+        "--generation_mode", type=str, default="sample", help="Either 'beam' or 'sample'.")
 
     args = parser.parse_args()
     main(args)

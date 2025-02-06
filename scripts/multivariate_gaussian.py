@@ -102,8 +102,8 @@ def do_loop(test_metrics, mu, sigma, test_confs=None, alpha=0.95, norm_confidenc
 def read_data(args, use_confidences):
 
 
-    # with h5py.File((Path(args.work_dir) / split / utils.CANDIDATES_FILENAME).with_suffix(".h5")) as h5_file:
-    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}.h5"
+
+    h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}_{args.generation_mode}.h5"
 
     f = h5py.File(h5_filename, 'r')
 
@@ -114,7 +114,7 @@ def read_data(args, use_confidences):
     f.close()
 
     if use_confidences:
-        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{args.model_class_name}.h5"
+        h5_filename_confidences = Path(args.work_dir) / args.split / f"{utils.COMET_CONFIDENCES_H5DS_NAME}_{args.model_class_name}_{args.generation_mode}.h5"
         f_conf = h5py.File(h5_filename_confidences, 'r')
 
         # sort layers and skip first one
@@ -175,12 +175,13 @@ def main(args):
     work_dir.mkdir(parents=True, exist_ok=True)
     if use_confidences:
         if args.norm_confidences:
-            output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results_with_error_pred_norm"
+            output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_results_with_error_pred_norm"
         else:
-            output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results_with_error_pred"
+            output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_with_error_pred"
     else:
-        output_path_base = work_dir / f"{args.model_class_name}_multivariate_gaussians_results"
-    
+        output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_results"
+
+
     utils.configure_logger("multivariate_gaussian.py", output_path_base.with_suffix(".log"))
     logging.info("Reading data")
     train_scores, test_scores, test_confs = read_data(args, use_confidences=use_confidences)
@@ -271,6 +272,11 @@ if __name__ == "__main__":
         default=[0.95, 0.9, 0.8, 0.7, 0.6],
         help="List of alpha values (default: [0.95, 0.9, 0.8, 0.7, 0.6])"
     )
+
+    parser.add_argument(
+        "--generation_mode", type=str, default="sample", help="Either 'beam' or 'sample'.")
+
+
 
     args = parser.parse_args()
     main(args)

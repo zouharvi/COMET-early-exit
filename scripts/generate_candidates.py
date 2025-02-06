@@ -35,37 +35,39 @@ def get_generation_config(mode, num_candidates, epsilon_cutoff=0.05):
 
 def process_result(output, tokenizer, generation_mode):
     """Process generation output to extract the data to save: text, token logprobs, and embeddings."""
-    texts = tokenizer.batch_decode(output.sequences, skip_special_tokens=True)
-    logprobs = torch.zeros_like(output.sequences[:, 2:], dtype=output.scores[0].dtype)
-    decoder_embeddings = []
-    for t in range(2, output.sequences.shape[1]):
-        if generation_mode == "beam":
-            # Get token log probabilities for beam search candidates.
-            # NOTE (julius) compute_transition_scores() is slow and was causing OOM
-            # errors so wrote a custom version.
-            # logprobs = model.compute_transition_scores(
-            #     result.sequences,
-            #     [scores for scores in result.scores],
-            #     beam_indices=result.beam_indices)[:, 1:]
-                beam_scores = output.scores[t-1].index_select(0, output.beam_indices[:, t-1].clamp(min=0))
-                seq_scores = beam_scores.gather(1, output.sequences[:, t:t+1]).squeeze()
-                logprobs[:, t-2] = seq_scores
-        else:
-            scores = output.scores[t-1].log_softmax(dim=-1)
-            logprobs[:, t-2] = scores.gather(1, output.sequences[:, t:t+1]).squeeze()
 
-        decoder_embeddings.append(output.decoder_hidden_states[t-1][-1].squeeze())
+    texts = tokenizer.batch_decode(output, skip_special_tokens=True)
+    # texts = tokenizer.batch_decode(output.sequences, skip_special_tokens=True)
+    # logprobs = torch.zeros_like(output.sequences[:, 2:], dtype=output.scores[0].dtype)
+    # decoder_embeddings = []
+    # for t in range(2, output.sequences.shape[1]):
+    #     if generation_mode == "beam":
+    #         # Get token log probabilities for beam search candidates.
+    #         # NOTE (julius) compute_transition_scores() is slow and was causing OOM
+    #         # errors so wrote a custom version.
+    #         # logprobs = model.compute_transition_scores(
+    #         #     result.sequences,
+    #         #     [scores for scores in result.scores],
+    #         #     beam_indices=result.beam_indices)[:, 1:]
+    #             beam_scores = output.scores[t-1].index_select(0, output.beam_indices[:, t-1].clamp(min=0))
+    #             seq_scores = beam_scores.gather(1, output.sequences[:, t:t+1]).squeeze()
+    #             logprobs[:, t-2] = seq_scores
+    #     else:
+    #         scores = output.scores[t-1].log_softmax(dim=-1)
+    #         logprobs[:, t-2] = scores.gather(1, output.sequences[:, t:t+1]).squeeze()
 
-    logprobs_list = []
-    for i in range(output.sequences.shape[0]):
-        seq_length = (output.sequences[i] != tokenizer.pad_token_id).sum() - 2
-        logprobs_list.append(logprobs[i][:seq_length].cpu().numpy())
+    #     decoder_embeddings.append(output.decoder_hidden_states[t-1][-1].squeeze())
 
-    decoder_embeddings = torch.stack(decoder_embeddings, dim=1)
-    mask = (output.sequences[:, 2:] != tokenizer.pad_token_id).unsqueeze(-1)
-    decoder_embeddings = (decoder_embeddings * mask).sum(dim=1) / mask.sum(1)
+    # logprobs_list = []
+    # for i in range(output.sequences.shape[0]):
+    #     seq_length = (output.sequences[i] != tokenizer.pad_token_id).sum() - 2
+    #     logprobs_list.append(logprobs[i][:seq_length].cpu().numpy())
 
-    return texts, logprobs_list, decoder_embeddings
+    # decoder_embeddings = torch.stack(decoder_embeddings, dim=1)
+    # mask = (output.sequences[:, 2:] != tokenizer.pad_token_id).unsqueeze(-1)
+    # decoder_embeddings = (decoder_embeddings * mask).sum(dim=1) / mask.sum(1)
+
+    return texts, [None] * len(texts), [None] * len(texts) #logprobs_list, decoder_embeddings
 
 
 def main(args):
@@ -95,22 +97,22 @@ def main(args):
         (len(data_lines), args.num_candidates),
         utils.H5_STRING_DTYPE
     )
-    token_logprobs_h5ds = output_file.create_dataset(
-        utils.CANDIDATES_TOKEN_LOGPROBS_H5DS_NAME,
-        (len(data_lines), args.num_candidates),
-        utils.H5_VLEN_FLOAT_DTYPE
-    )
-    counts_h5ds = output_file.create_dataset(
-        utils.CANDIDATES_COUNTS_H5DS_NAME,
-        (len(data_lines), args.num_candidates),
-        float
-    )
-    emb_size = model.model.decoder.layers[-1].final_layer_norm.weight.shape[0]
-    embeddings_h5ds = output_file.create_dataset(
-        utils.EMBEDDINGS_H5DS_NAME,
-        (len(data_lines), args.num_candidates, emb_size),
-        float
-    )
+    # token_logprobs_h5ds = output_file.create_dataset(
+    #     utils.CANDIDATES_TOKEN_LOGPROBS_H5DS_NAME,
+    #     (len(data_lines), args.num_candidates),
+    #     utils.H5_VLEN_FLOAT_DTYPE
+    # )
+    # counts_h5ds = output_file.create_dataset(
+    #     utils.CANDIDATES_COUNTS_H5DS_NAME,
+    #     (len(data_lines), args.num_candidates),
+    #     float
+    # )
+    # emb_size = model.model.decoder.layers[-1].final_layer_norm.weight.shape[0]
+    # embeddings_h5ds = output_file.create_dataset(
+    #     utils.EMBEDDINGS_H5DS_NAME,
+    #     (len(data_lines), args.num_candidates, emb_size),
+    #     float
+    # )
 
     gen_config = get_generation_config(
         args.generation_mode, args.num_candidates, epsilon_cutoff=args.epsilon)
@@ -135,9 +137,9 @@ def main(args):
                         **inputs,
                         generation_config=gen_config,
                         forced_bos_token_id=tgt_lang_token,
-                        output_scores=True,
-                        output_hidden_states=True,
-                        return_dict_in_generate=True)
+                        output_scores=False,
+                        output_hidden_states=False,
+                        return_dict_in_generate=False)
                 result_data = process_result(result, tokenizer, args.generation_mode)
                 all_result_data.append(result_data)
             except torch.OutOfMemoryError:
@@ -161,9 +163,9 @@ def main(args):
                             attention_mask=inputs["attention_mask"],
                             generation_config=gen_config,
                             forced_bos_token_id=tgt_lang_token,
-                            output_scores=True,
-                            output_hidden_states=True,
-                            return_dict_in_generate=True)
+                            output_scores=False,
+                            output_hidden_states=False,
+                            return_dict_in_generate=False)
                         result_data = process_result(result, tokenizer, args.generation_mode)
                         all_result_data.append(result_data)
                     num_samples_done += batch_size
@@ -175,17 +177,19 @@ def main(args):
                     max_batch_size = new_max_batch_size
 
         text_to_idx = {}
+
         for text, token_logprobs, embedding in zip(*[itertools.chain(*x) for x in zip(*all_result_data)]):
             if text not in text_to_idx:
                 text_idx = len(text_to_idx)
                 text_to_idx[text] = text_idx
+
                 text_h5ds[i, text_idx] = text
-                token_logprobs_h5ds[i, text_idx] = token_logprobs
-                embeddings_h5ds[i, text_idx] = embedding.cpu().numpy()
+                # token_logprobs_h5ds[i, text_idx] = token_logprobs
+                # embeddings_h5ds[i, text_idx] = embedding.cpu().numpy()
             else:
                 text_idx = text_to_idx[text]
 
-            counts_h5ds[i, text_idx] += 1
+            #counts_h5ds[i, text_idx] += 1
 
 
     output_file.close()
@@ -216,7 +220,7 @@ if __name__ == "__main__":
         "--generation_mode", type=str, default="sample", help="Either 'beam' or 'sample'.")
 
     parser.add_argument(
-        "--num_candidates", type=int, default=100, help="Number of candidates to generate.")
+        "--num_candidates", type=int, default=200, help="Number of candidates to generate.")
 
     parser.add_argument(
         "--epsilon", type=float, default=0.05, help="Threshold for epsilon sampling.")
@@ -231,5 +235,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
 
-# python scripts/generate_candidates.py vilem/scripts/data test_sample output --generation_mode sample
-# python scripts/generate_candidates.py vilem/scripts/data test_sample output --generation_mode beam
+# python scripts/generate_candidates.py vilem/scripts/data test_sample output --generation_mode sample --max_batch_size 50
+# python scripts/generate_candidates.py vilem/scripts/data test_sample output --generation_mode beam 
