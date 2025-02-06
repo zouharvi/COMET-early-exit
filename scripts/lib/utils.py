@@ -39,6 +39,8 @@ H5_VLEN_FLOAT_DTYPE = h5py.vlen_dtype(np.dtype('float32'))
 CANDIDATES_FILENAME = "candidates"
 CANDIDATES_TEXT_H5DS_NAME = "text"
 CANDIDATES_TOKEN_LOGPROBS_H5DS_NAME = "token_logprobs"
+CANDIDATES_COUNTS_H5DS_NAME = "counts"
+CANDIDATES_EMBEDDINGS_H5DS_NAME = "embeddings"
 
 # Name of COMET model should be appended to this
 COMET_SCORES_FILENAME_BASE = "scores_comet_"
@@ -51,6 +53,10 @@ EMBEDDINGS_H5DS_NAME = "embeddings"
 
 SIMILARITIES_FILENAME_BASE = "similarities_"
 SIMILARITIES_H5DS_NAME = "similarities"
+
+LOGPROBS_FILENAME_BASE = "logprobs"
+SUM_LOGPROBS_H5DS_NAME = "sum"
+AVG_LOGPROBS_H5DS_NAME = "avg"
 
 CONFIDENCE_MODELS = ["models-lithium", "models-beryllium"]
 NO_CONFIDENCE_MODELS = ["models-hydrogen", "models-helium"]

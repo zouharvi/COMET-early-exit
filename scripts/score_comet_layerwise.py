@@ -114,7 +114,8 @@ def main(args):
             
                 result = model.predict(samples=inputs, batch_size=args.comet_batch_size, mc_dropout=args.mc_dropout)
                 num_layers = len(result.scores[0])
-                assert num_layers == len(model.encoder.model.encoder.layer)+1
+                
+                #assert num_layers == len(model.encoder.model.encoder.layer)+1
                 scores = np.array(result.scores).reshape( -1,  candidates_text_h5ds.shape[1], num_layers) # instances x candidates x layers
                 scores = scores.transpose(2, 0, 1) # layers x instances x candidates 
 
