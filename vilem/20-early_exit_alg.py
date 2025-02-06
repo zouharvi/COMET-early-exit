@@ -16,8 +16,8 @@ layer_to_human = []
 for i in range(25):
     out_linregress = scipy.stats.linregress(
         [x["scores"][i] for x in data],
-        [x["scores"][-1] for x in data]
-        # [x["human"] for x in data]
+        # [x["scores"][-1] for x in data]
+        [x["human"] for x in data]
     )
     layer_to_human.append((out_linregress.intercept, out_linregress.slope))
 # %%
@@ -31,8 +31,8 @@ for layer in range(25):
     plot_y_base.append(
         scipy.stats.pearsonr(
             [x["scores"][layer] for x in data],
-            [x["scores"][-1] for x in data]
-            # [x["human"] for x in data]
+            # [x["scores"][-1] for x in data]
+            [x["human"] for x in data]
         ).correlation
     )
 def run_earlyexit1(line, threshold) -> Tuple[float, float]:
@@ -60,8 +60,8 @@ for threshold in [0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 9, 9.01, 9.02, 9.03, 9.04, 9.05
     plot_y_ee1.append(
         scipy.stats.pearsonr(
             [x[0] for x in out],
-            [x["scores"][-1] for x in data]
-            # [x["human"] for x in data]
+            # [x["scores"][-1] for x in data]
+            [x["human"] for x in data]
         ).correlation
     )
 
@@ -93,8 +93,8 @@ for threshold in [0, 0.001, 0.005, 0.1, 0.5, 1, 10]:
     plot_y_ee2.append(
         scipy.stats.pearsonr(
             [x[0] for x in out],
-            [x["scores"][-1] for x in data]
-            # [x["human"] for x in data]
+            # [x["scores"][-1] for x in data]
+            [x["human"] for x in data]
         ).correlation
     )
 

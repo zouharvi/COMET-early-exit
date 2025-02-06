@@ -6,7 +6,8 @@ import scipy.stats
 
 # data = json.load(open("../computed/eval_helium_mcd_02.json", "r"))
 # data = json.load(open("../computed/eval_helium_mcd_05.json", "r"))
-data = json.load(open("../computed/eval_helium_mcd_10.json", "r"))
+# data = json.load(open("../computed/eval_helium_mcd_10.json", "r"))
+data = json.load(open("../computed/eval_helium_mcd_50.json", "r"))
 
 # %%
 

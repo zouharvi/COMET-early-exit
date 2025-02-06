@@ -2,9 +2,15 @@ import comet
 import json
 from utils import FERTILITY
 import utils_candidates
+import random
+import argparse
 
-data = utils_candidates.get_data()
-print(len(data))
+args = argparse.ArgumentParser()
+args.add_argument("--data", default="sample", choices=["sample", "beam"])
+args = args.parse_args()
+
+# TODO: use full
+data = random.sample(utils_candidates.get_data(args.data), k=500)
 
 model_helium = comet.load_from_checkpoint("../COMET-early-exit/lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
 model_carbon = comet.load_from_checkpoint("../COMET-early-exit/lightning_logs/version_22525421/checkpoints/epoch=4-step=29320-val_pearson=0.380.ckpt")
@@ -48,5 +54,6 @@ for model_name, model in [
 print(json.dumps(data_out, ensure_ascii=False))
 
 """
-sbatch_gpu_big_short "score_candidates_partial" "python3 ../COMET-early-exit-experiments/vilem/30-score_partial_candidates.py"
+sbatch_gpu_big_short "score_candidates_partial_sample" "python3 ../COMET-early-exit-experiments/vilem/30-score_partial_candidates.py --data sample"
+sbatch_gpu_big_short "score_candidates_partial_beam" "python3 ../COMET-early-exit-experiments/vilem/30-score_partial_candidates.py --data beam"
 """

@@ -2,9 +2,10 @@ from tqdm import tqdm
 import h5py
 import json
 
-def get_data():
+def get_data(fname):
+    # beam or sample
     data_out = []
-    with h5py.File("data/candidates/beam_dev.h5") as candidates_file:
+    with h5py.File(f"data/candidates/{fname}_dev.h5") as candidates_file:
         candidates_text_h5ds = candidates_file["text"]
         data_lines = open("data/candidates/dev.jsonl").readlines()
 
