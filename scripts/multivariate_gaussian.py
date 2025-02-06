@@ -46,9 +46,7 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
 
     if test_confs is None:
         sigma_22_given_x1 = sigma_22 - np.matmul(sigma_21, np.matmul(sigma_11_inv, sigma_12))
-
         stdev = np.sqrt(sigma_22_given_x1[-1,-1])
-
         mu_2_given_x1 = []
         for x in test_data:
 
@@ -66,18 +64,17 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
         
         mu_2_given_x1 = []
         std_devs = []
+
+        norm_value = np.sqrt(np.pi/2) # go from absolute error to mean squared error
+
         for index, x in enumerate(test_data): 
             
             x_1 = x[:num_observed_columns] # (1, num_observed_columns)
-
             #######################
             # x_1 = x[num_observed_columns-1:num_observed_columns]
             #######################
-
             mu_2_given_x1_1 = mu_2 + np.matmul(sigma_21, np.matmul(sigma_11_inv, (x_1.reshape(-1,1) - mu_1)))
-
             mu_2_given_x1.append(mu_2_given_x1_1[-1,0])
-
             # # here is the uncertainty for each score added to the Cov
             error_pred = test_confs[index][:num_observed_columns]   # uncertainty is | score - target |
             #################
@@ -86,12 +83,17 @@ def conditional_distr(mu, sigma, test_data, num_observed_columns, test_confs=Non
             # breakpoint()
 
             if norm_confidences:
-                error_pred = error_pred * np.sqrt(np.pi/2) # go from absolute error to mean squared error
+                error_pred = error_pred * norm_value
+
+            #breakpoint()
             x_1_var = np.diag(error_pred **2 ) 
             
             sigma_22_given_x1 = sigma_22_given_x1_all  + np.matmul(np.matmul(sigma_21, sigma_11_inv), np.matmul(x_1_var, np.matmul(sigma_11_inv, sigma_12)))
+           
+            #sigma_22_given_x1 = np.matmul(np.matmul(sigma_21, sigma_11_inv), np.matmul(x_1_var, np.matmul(sigma_11_inv, sigma_12)))
 
             stdev = np.sqrt(sigma_22_given_x1[-1,-1]) 
+            
             std_devs.append(stdev)
 
             # breakpoint()
@@ -209,11 +211,11 @@ def main(args):
     work_dir.mkdir(parents=True, exist_ok=True)
     if use_confidences:
         if args.norm_confidences:
-            output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_results_with_error_pred_norm"
+            output_path_base = work_dir / f"{args.model_class_name}_{args.generation_mode}_mvg_results_with_error_pred_norm"
         else:
-            output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_with_error_pred"
+            output_path_base = work_dir / f"{args.model_class_name}_{args.generation_mode}_mvg_with_error_pred"
     else:
-        output_path_base = work_dir / f"{args.model_class_name}__{args.generation_mode}_mvg_results"
+        output_path_base = work_dir / f"{args.model_class_name}_{args.generation_mode}_mvg_results"
 
 
     utils.configure_logger("multivariate_gaussian.py", output_path_base.with_suffix(".log"))
@@ -319,7 +321,7 @@ if __name__ == "__main__":
         "--alphas",
         type=float,
         nargs='+',
-        default=[0.999, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6],
+        default=[0.999, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6, 0.55, 0.52, 0.51, 0.505, 0.502, 0.501, 0.5005],
         help="List of alpha values (default: [0.95, 0.9, 0.8, 0.7, 0.6])"
     )
 
