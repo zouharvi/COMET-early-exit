@@ -148,12 +148,6 @@ def main(args):
     utils.configure_logger("multivariate_gaussian.py", output_path_base.with_suffix(".log"))
     logging.info("Reading data")
     train_scores, test_scores, test_confs = read_data(args, model_class_name=args.model_class_name, use_confidences=use_confidences)
-    #_, baseline_test_scores, _ = read_data(args, model_class_name=args.baseline_model, use_confidences=use_confidences)
-
-    logging.info("Prepairing train data")
-    # train_scores = np.vstack(train_scores)
-    # mu_train = np.mean(train_scores, axis=0).reshape(-1, 1)
-    # sigma_train = np.cov(train_scores, rowvar=False)
 
 
 
@@ -161,7 +155,6 @@ def main(args):
     best_comets = 0
     random_comets = 0
     winner_comets = defaultdict(float)
-    winner_comets_baseline = defaultdict(float) 
     correct_ex = defaultdict(float)
     not_dropped = defaultdict(float)
     num_candidates = []
@@ -217,8 +210,6 @@ def main(args):
     for key in random_subset_winner:
         random_subset_winner[key] /= num_samples   
 
-    breakpoint()     
-
     import json
     with open(output_path_base.with_suffix(".json"), "w") as json_file:
         json.dump([dict(random_subset), dict(random_subset_winner)], json_file, indent=4)
@@ -260,14 +251,6 @@ if __name__ == "__main__":
     
     parser.add_argument("model_class_name",
                         help="Name of the model class, e.g. 'hydrogen', 'lithium'." )
-
-    # parser.add_argument(
-    #     "baseline_model",
-    #     nargs="?",
-    #     default="wmt22-cometkiwi-da",  # Set the default value
-    #     help="Name of the model class, usually CometKiwi."
-    # )
-
     parser.add_argument(
         "--use_confidences", action="store_true", help="Incorporate a model's error prediction.")
     
@@ -291,16 +274,7 @@ if __name__ == "__main__":
     main(args)
 
 
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output wmt22-cometkiwi-da
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-hydrogen
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium --use_confidences
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-lithium --use_confidences --norm_confidences
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium --use_confidences
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-beryllium --use_confidences --norm_confidences
-# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-helium
+
+# python scripts/multivariate_gaussian.py vilem/scripts/data dev output models-oxygen --use_confidences --norm_confidences
 
 
-
-# # python efficient_reranking/scripts/multivariate_gaussian.py vilem/scripts/data toy output wmt22-cometkiwi-da
