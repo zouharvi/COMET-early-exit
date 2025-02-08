@@ -17,19 +17,29 @@ def print_table(fname):
         return f"\\cellcolor{{purple!{y_color*100:.0f}}} {y:.2f}"
 
 
-    layers = list(range(1, 23+1, 4))+[23]
+    layers1 = list(range(1, 23+1, 2))+[23]
+    layers2 = list(range(1, 23+1, 4))+[23]
+    # layers = list(range(1, 23+1))
 
-    for layer1 in layers:
+    print(
+        # "", "", r"$\bm{\downarrow}$\hspace{3mm}\null",
+        "", "", "",
+        *[f"\\tiny {layer2:0>2}" for layer2 in layers2],
+        sep=" & ",
+        end="\\\\\n",
+        file=fout,
+    )
+    for layer1 in layers1:
         print(
             f"& \\tiny {layer1:0>2} & {format_cell_human(data[layer1]['corr_human'])}",
             file=fout,
         )
-        for layer2 in layers:
+        for layer2 in layers2:
             print(f'& {format_cell(data[layer1]["corr"][layer2])}', end=" ", file=fout)
         print("\\\\", file=fout)
 
     fout.close()
 
-print_table("../computed/eval_beryllium.json")
-print_table("../computed/eval_helium2hydrogen.json")
+print_table("../computed/10-eval_beryllium.json")
+print_table("../computed/10-eval_helium2hydrogen.json")
 # print_table("../computed/eval_nitrogen.json")

@@ -78,12 +78,13 @@ sbatch_gpu_big "train_helium" "comet-train --cfg configs/experimental/baseline_m
 sbatch_gpu_big "train_hydrogen" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
 sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexitconf_model_human.yaml"
 sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
-sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/partial_model.yaml"
-sbatch_gpu_big "train_carbon" "comet-train --cfg configs/experimental/partial_model.yaml"
+sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/baseline_model_boron.yaml"
+sbatch_gpu_big "train_carbon" "comet-train --cfg configs/experimental/baseline_model_carbon.yaml"
 sbatch_gpu_big "train_nitrogen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last_old.yaml"
 sbatch_gpu_bigg "train_oxygen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last.yaml"
-sbatch_gpu_bigg "train_fluorine" "comet-train --cfg configs/experimental/partial_model_fluorine.yaml"
-sbatch_gpu_bigg "train_neon" "comet-train --cfg configs/experimental/partial_model_neon.yaml"
+sbatch_gpu_bigg "train_fluorine" "comet-train --cfg configs/experimental/baseline_model_fluorine.yaml"
+sbatch_gpu_bigg "train_neon" "comet-train --cfg configs/experimental/baseline_model_neon.yaml"
+sbatch_gpu_bigg "train_sodium" "comet-train --cfg configs/experimental/baseline_model_sodium.yaml"
 
 
 # remove all but last checkpoint

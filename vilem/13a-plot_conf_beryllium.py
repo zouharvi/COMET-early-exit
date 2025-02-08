@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import scipy.stats
 
 data = json.load(open("../computed/eval_beryllium_conf.json", "r"))
-# data = json.load(open("../computed/eval_lithium_conf.json", "r"))
 
 # %%
 

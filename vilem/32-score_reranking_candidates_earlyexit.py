@@ -30,7 +30,12 @@ for model_name, model in [
     ("helium", model_helium),
     ("beryllium", model_beryllium),
 ]:
-    scores = model.predict(data_flat, batch_size=128)["scores"]
+    out = model.predict(data_flat, batch_size=128)
+    scores = out["scores"]
+    if model_name == "helium":
+        confidences = [0 for _ in range(len(scores))]
+    else:
+        confidences = out["confidences"]
     # reconstruct the original structure
     data_out[model_name] = [
         {
@@ -38,6 +43,10 @@ for model_name, model in [
             "tgts": line["tgts"],
             "scores": [
                 scores.pop(0)
+                for _ in line["tgts"]
+            ],
+            "confidences": [
+                confidences.pop(0)
                 for _ in line["tgts"]
             ],
             "langs": line["langs"],
