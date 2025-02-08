@@ -22,7 +22,6 @@ def print_table(fname):
     # layers = list(range(1, 23+1))
 
     print(
-        # "", "", r"$\bm{\downarrow}$\hspace{3mm}\null",
         "", "", "",
         *[f"\\tiny {layer2:0>2}" for layer2 in layers2],
         sep=" & ",
@@ -40,6 +39,9 @@ def print_table(fname):
 
     fout.close()
 
-print_table("../computed/10-eval_beryllium.json")
-print_table("../computed/10-eval_helium2hydrogen.json")
+    print(data[-1]["corr_human"])
+
+# print_table("../computed/10-eval_beryllium.json")
+print_table("../computed/10-eval_hydrogen.json")
+# print_table("../computed/10-eval_helium2hydrogen.json")
 # print_table("../computed/eval_nitrogen.json")

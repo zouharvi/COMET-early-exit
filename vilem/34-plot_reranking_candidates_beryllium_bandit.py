@@ -1,5 +1,7 @@
 # %%
 
+raise Exception("This bandit script is incorrect. Use Beni's implementation.")
+
 import json
 import numpy as np
 import random
