@@ -16,12 +16,13 @@ for pred, line in zip(out["scores"], data):
     data_out.append({
         "src": line["src"],
         "mt": line["mt"],
-        "score": abs(float(line["score"]) - pred)
+        "score": abs(float(line["score"]) - pred),
+        "predicted": pred,
     })
 
 
 with open(args.data_out, "w") as f:
-    writer = csv.DictWriter(f, fieldnames=["src", "mt", "score"])
+    writer = csv.DictWriter(f, fieldnames=["src", "mt", "score", "predicted"])
     writer.writeheader()
     writer.writerows(data_out)
 

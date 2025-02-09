@@ -85,7 +85,8 @@ sbatch_gpu_bigg "train_oxygen" "comet-train --cfg configs/experimental/earlyexit
 sbatch_gpu_bigg "train_fluorine" "comet-train --cfg configs/experimental/baseline_model_fluorine.yaml"
 sbatch_gpu_bigg "train_neon" "comet-train --cfg configs/experimental/baseline_model_neon.yaml"
 sbatch_gpu_bigg "train_sodium" "comet-train --cfg configs/experimental/baseline_model_sodium.yaml"
-sbatch_gpu_bigg "train_magnesium" "comet-train --cfg configs/experimental/conf_model_human.yaml"
+sbatch_gpu_bigg "train_magnesium" "comet-train --cfg configs/experimental/instantconf_model.yaml"
+sbatch_gpu_short "train_aluminium" "comet-train --cfg configs/experimental/direct_uncertainty_prediction.yaml"
 
 
 # remove all but last checkpoint
