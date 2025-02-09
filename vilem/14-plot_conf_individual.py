@@ -20,15 +20,38 @@ def plot_segment(ax_i, segment_i):
     ax = axs[ax_i]
     ax.plot(
         arr_score[segment_i],
-        color="black",
+        color="#aaa",
     )
 
     ax.fill_between(
         range(arr_score.shape[1]),
         arr_score[segment_i]-arr_conf[segment_i],
         arr_score[segment_i]+arr_conf[segment_i],
+        color="#ccc",
+    )
+
+    early_stop_i = (arr_conf[segment_i]<4).argmax()
+    ax.plot(
+        arr_score[segment_i][:early_stop_i],
+        color="black",
+    )
+
+    ax.fill_between(
+        range(early_stop_i),
+        (arr_score[segment_i]-arr_conf[segment_i])[:early_stop_i],
+        (arr_score[segment_i]+arr_conf[segment_i])[:early_stop_i],
         color="gray",
     )
+
+    ax.vlines(
+        x=early_stop_i-1,
+        ymin=(arr_score[segment_i]-arr_conf[segment_i])[early_stop_i-1],
+        ymax=(arr_score[segment_i]+arr_conf[segment_i])[early_stop_i-1],
+        color=utils_figs.COLORS[0],
+        linewidth=2,
+    )
+
+
     ax.set_xticks([])
     ax.set_yticks([])
     ax.spines[['top', 'right']].set_visible(False)
@@ -41,7 +64,7 @@ def plot_segment(ax_i, segment_i):
 plot_segment((0, 0), 0)
 plot_segment((0, 1), 4)
 plot_segment((1, 0), 5)
-plot_segment((1, 1), 6)
+plot_segment((1, 1), 12)
 
 # plt.xlabel("Layer (correlation)")
 plt.tight_layout(pad=0.5)
