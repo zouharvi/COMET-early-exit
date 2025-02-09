@@ -11,8 +11,7 @@ data = json.load(open("../computed/eval_beryllium_conf.json", "r"))
 
 # %%
 
-# for target in ["hum", "last"]:
-for target in ["last"]:
+for target in ["hum", "last"]:
     target_y = {
         "hum": [x["human"] for x in data],
         "last": [x["scores"][-1] for x in data],
@@ -89,11 +88,12 @@ for target in ["last"]:
         plt.ylabel("Correlation w/ Human")
     elif target == "last":
         plt.ylabel("Correlation w/ Final")
+    plt.xlim(0.1, None)
     plt.xlabel("Cost")
     # percentage xticks
     plt.xticks(
-        [0, 0.25, 0.5, 0.75, 1],
-        ["0%", "25%", "50%", "75%", "100%"]
+        [0.25, 0.5, 0.75, 1],
+        ["25%", "50%", "75%", "100%"]
     )
     plt.tight_layout(pad=0)
     plt.savefig(f"../figures/20-early_exit_alg_{target}.pdf")
