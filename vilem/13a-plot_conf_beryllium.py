@@ -16,17 +16,21 @@ arr_human = np.array([x["human"] for x in data])
 
 # duplicate [A] to [A, A, A]
 arr_score_last_m = np.tile(arr_score[:,-1], (arr_score.shape[1], 1)).T
+arr_human_m = np.tile(arr_human, (arr_score.shape[1], 1)).T
 
 plt.figure(figsize=(4, 2))
 plt.plot(
     np.average(np.abs(arr_score-arr_score_last_m), axis=0),
+    # np.average(np.abs(arr_score-arr_human_m), axis=0),
     label="True error",
     color="black",
+    linewidth=2,
 )
 plt.plot(
     np.average(arr_conf, axis=0),
-    label="Pointwise confidence",
-    color="gray",
+    label="Instant Confidence",
+    color=utils_figs.COLORS[0],
+    linewidth=2,
 )
 plt.legend(
     handlelength=1,

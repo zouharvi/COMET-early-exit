@@ -9,12 +9,15 @@ import matplotlib.pyplot as plt
 import scipy.stats
 
 # TODO: use all data
-data = json.load(open("../computed/eval_lithium_conf.json", "r"))
+# data = json.load(open("../computed/eval_lithium_conf.json", "r"))
+data = json.load(open("../computed/eval_magnesium_conf.json", "r"))
 
 # %%
-arr_score = np.array([x["scores"][-1] for x in data])
 arr_human = np.array([x["human"] for x in data])
-arr_conf = np.array([x["confidence"][-1] for x in data])
+# arr_score = np.array([x["scores"][-1] for x in data])
+# arr_conf = np.array([x["confidence"][-1] for x in data])
+arr_score = np.array([x["scores"] for x in data])
+arr_conf = np.array([x["confidence"] for x in data])
 
 hum_corr = scipy.stats.pearsonr(
     arr_score, arr_human,
@@ -46,7 +49,7 @@ for i in range(0, len(bins)):
     plot_x.append(i)
     plot_y.append(mae)
 
-plt.figure(figsize=(3, 2))
+plt.figure(figsize=(4, 2))
 
 model = sklearn.linear_model.LinearRegression(fit_intercept=False)
 model.fit(
@@ -64,4 +67,4 @@ utils_figs.turn_off_spines()
 plt.ylabel("Prediction error")
 plt.xlabel("Confidence bins")
 plt.tight_layout(pad=0)
-plt.savefig("../figures/15b-lithium_ece.pdf")
+plt.savefig("../figures/15c-expected_calibration_error.pdf")
