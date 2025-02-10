@@ -23,14 +23,14 @@ def print_table(fname):
 
     print(
         "", "", "",
-        *[f"\\tiny {layer2:0>2}" for layer2 in layers2],
+        *[f"\\tiny {layer2+1:0>2}" for layer2 in layers2],
         sep=" & ",
         end="\\\\\n",
         file=fout,
     )
     for layer1 in layers1:
         print(
-            f"& \\tiny {layer1:0>2} & {format_cell_human(data[layer1]['corr_human'])}",
+            f"& \\tiny {layer1+1:0>2} & {format_cell_human(data[layer1]['corr_human'])}",
             file=fout,
         )
         for layer2 in layers2:
@@ -41,7 +41,7 @@ def print_table(fname):
 
     print(data[-1]["corr_human"])
 
-# print_table("../computed/10-eval_beryllium.json")
-print_table("../computed/10-eval_hydrogen.json")
-# print_table("../computed/10-eval_helium2hydrogen.json")
+print_table("../computed/10-eval_beryllium.json")
+print_table("../computed/10-eval_helium2hydrogen.json")
+# print_table("../computed/10-eval_hydrogen.json")
 # print_table("../computed/eval_nitrogen.json")

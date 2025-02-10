@@ -8,19 +8,11 @@ import pickle
 
 with open("../computed/bandit_start_14324_ucb_10_normbeam.pkl", "rb") as f:
     data_sample = pickle.load(f)
-# with open("../computed/bandit_start_14324_ucb_05_normbeam.pkl", "rb") as f:
-#     data_sample_05 = pickle.load(f)
 with open("../computed/bandit_start_16000_ucb_10_normsample.pkl", "rb") as f:
     data_beam = pickle.load(f)
-# with open("../computed/bandit_start_16000_ucb_05_normsample.pkl", "rb") as f:
-#     data_beam_05 = pickle.load(f)
-# data_beam["scores"]["bandit (0, 0.5)"] = data_beam_05["scores"]["bandit (0, 0.5)"]
-# data_sample["scores"]["bandit (0, 0.5)"] = data_sample_05["scores"]["bandit (0, 0.5)"]
 
-# print(data_sample["scores"].keys())
 METHOD_TO_NAME = {
-    # 'bandit (0, 0.5)': "Bandit (exploit)",
-    'bandit (0, 1.0)': "Bandit (default)",
+    'bandit (0, 1.0)': "Bandit ($\\gamma=1.0$)",
     'random baseline': "Random",
     'top-k sum logprob': "LogProb Sum",
     'top-k avg logprob': "LogProb Avg",
@@ -28,6 +20,16 @@ METHOD_TO_NAME = {
 
 for name, data in [("beam", data_beam), ("sample", data_sample)]:
     for mode in ["avg_score", "win_rate"]:
+        fout = open(f"../computed/52-bandit_{mode}_{name}.tex", "w")
+        print(r"\begin{tabular}{lYYYYYYYYY}", file=fout)
+        # NOTE: be careful that the costs are always aligned
+
+        if mode == "win_rate" and name == "beam":
+            print(r"\toprule", file=fout)
+            cost = [f"{x[0]:.0%}".replace("%", r"\%") for x in zip(*data["scores"]["random baseline"]["avg_score"]) if x[0] > 0.1][::2]
+            print("", *cost, sep=" & ", end="\\\\\n", file=fout)
+            print(r"\midrule", file=fout)
+
         plt.figure(figsize=(4, 2))
         for method in METHOD_TO_NAME:
             data_local = zip(*data["scores"][method][mode])
@@ -37,6 +39,15 @@ for name, data in [("beam", data_beam), ("sample", data_sample)]:
                 [x[1] for x in data_local],
                 label=METHOD_TO_NAME[method],
             )
+            
+            print(METHOD_TO_NAME[method], "& ", file=fout)
+            if mode == "win_rate":
+                print(*[f"{x[1]:.1%}".replace("%", r"\%") for x in data_local][::2], sep=" & ", end="\\\\\n", file=fout)
+            else:
+                print(*[f"{x[1]:.2f}" for x in data_local][::2], sep=" & ", end="\\\\\n", file=fout)
+
+        print(r"\bottomrule\end{tabular}", file=fout)
+        fout.close()
 
         plt.xticks(
             [0.2, 0.4, 0.6, 0.8, 1.0],

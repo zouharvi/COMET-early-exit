@@ -4,7 +4,6 @@ import json
 import utils_figs
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats
 
 data = json.load(open("../computed/eval_beryllium_conf.json", "r"))
 
@@ -62,7 +61,7 @@ def plot_segment(ax_i, segment_i):
         ax.set_xlabel("Layer")
 
 plot_segment((0, 0), 0)
-plot_segment((0, 1), 4)
+plot_segment((0, 1), 20)
 plot_segment((1, 0), 5)
 plot_segment((1, 1), 12)
 

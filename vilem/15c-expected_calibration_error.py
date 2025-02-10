@@ -28,9 +28,6 @@ error_corr = scipy.stats.pearsonr(
 ).correlation
 print(f"{hum_corr:.3f} {error_corr:.3f}")
 
-# %%
-# ECE
-
 # 100 bins based on arr_conf such that each bin has same number of samples
 bins = np.array_split(-np.sort(-arr_conf), 100)
 bins = [
