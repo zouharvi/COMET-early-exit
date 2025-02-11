@@ -103,6 +103,7 @@ tar -C lightning_logs/version_22525419/ -cf lightning_logs/model-boron.tar .
 tar -C lightning_logs/helium2hydrogen/ -cf lightning_logs/model-helium2hydrogen.tar .
 tar -C lightning_logs/version_22525421/ -cf lightning_logs/model-carbon.tar .
 tar -C lightning_logs/version_22525435/ -cf lightning_logs/model-oxygen.tar .
+tar -C lightning_logs/version_22525433/ -cf lightning_logs/model-nitrogen.tar .
 
 rclone copy lightning_logs/model-helium.tar polybox:t/
 rclone copy lightning_logs/model-hydrogen.tar polybox:t/
@@ -112,3 +113,4 @@ rclone copy lightning_logs/model-boron.tar polybox:t/
 rclone copy lightning_logs/model-helium2hydrogen.tar polybox:t/
 rclone copy lightning_logs/model-carbon.tar polybox:t/
 rclone copy lightning_logs/model-oxygen.tar polybox:t/
+rclone copy lightning_logs/model-nitrogen.tar polybox:t/

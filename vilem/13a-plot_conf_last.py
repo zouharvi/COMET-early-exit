@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 
-data = json.load(open("../computed/eval_beryllium_conf.json", "r"))
+data = json.load(open("../computed/13-eval_nitrogen_conf.json", "r"))
 
 # %%
 
@@ -60,4 +60,9 @@ plt.xticks(
 utils_figs.turn_off_spines()
 plt.tight_layout(pad=0)
 plt.xlabel("Layer (correlation)")
-plt.savefig("../figures/13-plot_conf.pdf")
+plt.savefig("../figures/13-plot_conf_last.pdf")
+
+
+"""
+scp euler:/cluster/work/sachan/vilem/COMET-early-exit/logs/eval_nitrogen_conf.out computed/13-eval_nitrogen_conf.json
+"""

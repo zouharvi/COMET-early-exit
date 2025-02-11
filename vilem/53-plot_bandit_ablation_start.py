@@ -6,17 +6,17 @@ import pickle
 
 # TODO: plot ablation in the appendix
 
-with open("../computed/bandit_start_ablation_16000_norm_ucb05sample.pkl", "rb") as f:
+with open("../computed/bandit_start_ablation_16000_norm_ucb10sample.pkl", "rb") as f:
     data_sample = pickle.load(f)
-with open("../computed/bandit_start_ablation_16000_norm_ucb05sample.pkl", "rb") as f:
+with open("../computed/bandit_start_ablation_16000_norm_ucb10sample.pkl", "rb") as f:
     data_beam = pickle.load(f)
 
 print(data_sample["scores"].keys())
 
 METHOD_TO_CONFIG = {
-    'bandit (0, 0.5)': dict(name="Bandit ($\\geq$layer 1)", color=utils_figs.COLORS[0], alpha=1),
-    'bandit (4, 0.5)': dict(name="Bandit ($\\geq$layer 5)", color=utils_figs.COLORS[0], alpha=0.5),
-    'bandit (12, 0.5)': dict(name="Bandit ($\\geq$layer 13)", color=utils_figs.COLORS[0], alpha=0.2),
+    'bandit (0, 1.0)': dict(name="Bandit ($\\geq$layer 1)", color=utils_figs.COLORS[0], alpha=1),
+    'bandit (4, 1.0)': dict(name="Bandit ($\\geq$layer 5)", color=utils_figs.COLORS[0], alpha=0.5),
+    'bandit (12, 1.0)': dict(name="Bandit ($\\geq$layer 13)", color=utils_figs.COLORS[0], alpha=0.2),
     'random baseline': dict(name="Random", color=utils_figs.COLORS[1], alpha=1),
     # 'top-k sum logprob': dict(name="LogProb Sum", color=utils_figs.COLORS[2], alpha=1),
     # 'top-k avg logprob': dict(name="LogProb Avg", color=utils_figs.COLORS[3], alpha=1),
