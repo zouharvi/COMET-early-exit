@@ -7,9 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 
-data = json.load(open("../computed/eval_beryllium_conf.json", "r"))
+data = json.load(open("../computed/13-eval_oxygen_conf.json", "r"))
 
-# %%
 
 for target in ["hum", "last"]:
     target_y = {
@@ -49,6 +48,8 @@ for target in ["hum", "last"]:
             ).correlation
         )
 
+    print([f"{x[0]:.1f}:{x[1]:.3f}" for x in zip(plot_x_ee1, plot_y_ee1)])
+
     def run_earlyexit_var(line, threshold) -> Tuple[float, float]:
         for i in range(25):
             if np.var(line["scores"][i-3:i+1]) < threshold:
@@ -82,7 +83,7 @@ for target in ["hum", "last"]:
         plot_x_ee2, plot_y_ee2,
         label="Variance-Exit",
     )
-    plt.legend()
+    plt.legend(loc="lower right")
     utils_figs.turn_off_spines()
     if target == "hum":
         plt.ylabel("Correlation w/ Human")
@@ -95,6 +96,10 @@ for target in ["hum", "last"]:
         [0.25, 0.5, 0.75, 1],
         ["25%", "50%", "75%", "100%"]
     )
+    if target == "hum":
+        plt.ylim(0.1, None)
+    elif target == "last":
+        plt.ylim(0.3, None)
     plt.tight_layout(pad=0)
     plt.savefig(f"../figures/20-early_exit_alg_{target}.pdf")
     plt.show()

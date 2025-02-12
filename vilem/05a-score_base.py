@@ -17,7 +17,7 @@ pred_y = np.array(model.predict(data, batch_size=128)["scores"]).T
 
 data_out = []
 data_y = [float(x["score"]) for x in data]
-for layer_i, layer_y in list(enumerate(pred_y))[1:]:
+for layer_i, layer_y in list(enumerate(pred_y)):
     corr_gold = scipy.stats.pearsonr(data_y, layer_y).correlation
     data_out.append({
         "layer": layer_i,
@@ -40,10 +40,11 @@ print(
 )
 
 """
-sbatch_gpu_big_short "eval_beryllium" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504386/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
-sbatch_gpu_big_short "eval_lithium" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504384/checkpoints/epoch=4-step=29320-val_avg_pearson=0.255.ckpt'"
-sbatch_gpu_big_short "eval_helium2hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/helium2hydrogen/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt'"
-sbatch_gpu_big_short "eval_hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504382/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
-sbatch_gpu_big_short "eval_nitrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22525433/checkpoints/epoch=4-step=29320-val_avg_pearson=0.225.ckpt'"
 sbatch_gpu_big_short "eval_oxygen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22525435/checkpoints/epoch=4-step=29320-val_avg_pearson=0.254.ckpt'"
+sbatch_gpu_big_short "eval_helium2hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/helium2hydrogen/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt'"
+sbatch_gpu_big_short "eval_nitrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22525433/checkpoints/epoch=4-step=29320-val_avg_pearson=0.225.ckpt'"
+sbatch_gpu_big_short "eval_beryllium" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504386/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
+
+sbatch_gpu_big_short "eval_lithium" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504384/checkpoints/epoch=4-step=29320-val_avg_pearson=0.255.ckpt'"
+sbatch_gpu_big_short "eval_hydrogen" "python3 ../COMET-early-exit-experiments/vilem/05a-score_base.py 'lightning_logs/version_22504382/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
 """

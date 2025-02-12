@@ -53,7 +53,7 @@ for layer_i in range(24):
 
 """
 sbatch_gpu_big_short "eval_beryllium_conf" "python3 ../COMET-early-exit-experiments/vilem/05c-score_earlyexit_conf.py 'lightning_logs/version_22504386/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt'"
+sbatch_gpu_big_short "eval_oxygen_conf" "python3 ../COMET-early-exit-experiments/vilem/05c-score_earlyexit_conf.py 'lightning_logs/version_22525435/checkpoints/epoch=4-step=29320-val_avg_pearson=0.254.ckpt'"
 sbatch_gpu_big_short "eval_nitrogen_conf" "python3 ../COMET-early-exit-experiments/vilem/05c-score_earlyexit_conf.py 'lightning_logs/version_22525433/checkpoints/epoch=4-step=29320-val_avg_pearson=0.225.ckpt'"
 sbatch_gpu_big_short "eval_lithium_conf" "python3 ../COMET-early-exit-experiments/vilem/05c-score_earlyexit_conf.py 'lightning_logs/version_22504384/checkpoints/epoch=4-step=29320-val_avg_pearson=0.255.ckpt'"
-sbatch_gpu_big_short "eval_oxygen_conf" "python3 ../COMET-early-exit-experiments/vilem/05c-score_earlyexit_conf.py 'lightning_logs/version_22525435/checkpoints/epoch=4-step=29320-val_avg_pearson=0.254.ckpt'"
 """
