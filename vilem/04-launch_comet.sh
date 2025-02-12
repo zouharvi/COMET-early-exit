@@ -90,6 +90,11 @@ sbatch_gpu_bigg "train_sodium" "comet-train --cfg configs/experimental/baseline_
 sbatch_gpu_bigg "train_magnesium" "comet-train --cfg configs/experimental/instantconf_model.yaml"
 sbatch_gpu_bigg "train_aluminium" "comet-train --cfg configs/experimental/direct_uncertainty_prediction.yaml"
 sbatch_gpu_big "train_silicon" "comet-train --cfg configs/experimental/earlyexitmulti_model.yaml"
+sbatch_gpu_big "train_phosphorus" "comet-train --cfg configs/experimental/instantconf_model_10.yaml"
+sbatch_gpu_big "train_sulfur" "comet-train --cfg configs/experimental/instantconf_model_025.yaml"
+sbatch_gpu_big "train_chlorine" "comet-train --cfg configs/experimental/instantconf_model_20.yaml"
+sbatch_gpu_big "train_argon" "comet-train --cfg configs/experimental/instantconf_model_075.yaml"
+
 
 
 # remove all but last checkpoint
