@@ -43,4 +43,8 @@ print(
 
 """
 sbatch_gpu_big_short "eval_magnesium_conf" "python3 ../COMET-early-exit-experiments/vilem/05b-score_conf.py 'lightning_logs/version_22525447/checkpoints/epoch=4-step=29320-val_pearson=0.405.ckpt'"
+sbatch_gpu_big_short "eval_phosphorus_conf" "python3 ../COMET-early-exit-experiments/vilem/05b-score_conf.py 'lightning_logs/version_22525456/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt'"
+sbatch_gpu_big_short "eval_sulfur_conf" "python3 ../COMET-early-exit-experiments/vilem/05b-score_conf.py 'lightning_logs/version_22525457/checkpoints/epoch=4-step=29320-val_pearson=0.415.ckpt'"
+sbatch_gpu_big_short "eval_chlorine_conf" "python3 ../COMET-early-exit-experiments/vilem/05b-score_conf.py 'lightning_logs/version_22525458/checkpoints/epoch=4-step=29320-val_pearson=0.423.ckpt'"
+sbatch_gpu_big_short "eval_argon_conf" "python3 ../COMET-early-exit-experiments/vilem/05b-score_conf.py 'lightning_logs/version_22525459/checkpoints/epoch=4-step=29320-val_pearson=0.425.ckpt'"
 """
