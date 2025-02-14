@@ -95,6 +95,11 @@ sbatch_gpu_big "train_chlorine" "comet-train --cfg configs/experimental/instantc
 sbatch_gpu_big "train_argon" "comet-train --cfg configs/experimental/instantconf_model_075.yaml"
 sbatch_gpu_big "train_phosphorus" "comet-train --cfg configs/experimental/instantconf_model_10.yaml"
 
+# make sure to use ZervaCOMET
+sbatch_gpu_big "train_potassium" "comet-train --cfg configs/models/baseline_hts.yaml"
+sbatch_gpu_big "train_calcium" "comet-train --cfg configs/models/baseline_hts2.yaml"
+
+
 
 
 # remove all but last checkpoint

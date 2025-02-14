@@ -77,7 +77,7 @@ for target in ["hum", "last"]:
     )
     plt.plot(
         plot_x_ee1, plot_y_ee1,
-        label="Threshold-Exit",
+        label="Confidence-Exit",
     )
     plt.plot(
         plot_x_ee2, plot_y_ee2,
