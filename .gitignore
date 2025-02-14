@@ -180,3 +180,9 @@ vilem/data*
 vilem/scripts/data*
 z_outputs
 figures*
+scripts/bandit.py
+scripts/scratch.ipynb
+tmp
+Early_Exit_COMET (1).pdf
+scripts/constant_layer_pred.py
+.DS_Store
