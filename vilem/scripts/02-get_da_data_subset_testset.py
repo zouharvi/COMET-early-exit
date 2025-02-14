@@ -119,6 +119,16 @@ for x in data_train:
 data_test_by_langs = collections.defaultdict(list)
 for x in data_test:
     data_test_by_langs[x["langs"]].append(x)
+    
+# Print counts per language
+print("TRAIN DATA COUNT:")
+for lang, examples in data_train_by_langs.items():
+    print(f"{lang}: {len(examples)}")
+
+print("\nTEST DATA COUNT:")
+for lang, examples in data_test_by_langs.items():
+    print(f"{lang}: {len(examples)}")
+raise Exception
 
 data_dev = []
 data_test_sample = []
@@ -153,4 +163,4 @@ print("TEST SAMPLE: ", len(data_test_sample))
 #open("data/jsonl/train.jsonl", "w").writelines(json.dumps(line, ensure_ascii=False) + "\n" for line in data_train)
 #open("data/jsonl/test.jsonl", "w").writelines(json.dumps(line, ensure_ascii=False) + "\n" for line in data_test)
 #open("data/jsonl/dev.jsonl", "w").writelines(json.dumps(line, ensure_ascii=False) + "\n" for line in data_dev)
-open("data/jsonl/test_sample.jsonl", "w").writelines(json.dumps(line, ensure_ascii=False) + "\n" for line in data_test_sample)
+#open("data/jsonl/test_sample.jsonl", "w").writelines(json.dumps(line, ensure_ascii=False) + "\n" for line in data_test_sample)

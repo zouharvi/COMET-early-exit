@@ -179,7 +179,13 @@ models
 vilem/data*
 vilem/scripts/data*
 z_outputs
+<<<<<<< HEAD
+*.sh
+data/*
+=======
 figures*
+>>>>>>> 1adefc065d3456dfba5d7503c81ef60da9da345f
+
 scripts/bandit.py
 scripts/scratch.ipynb
 tmp
