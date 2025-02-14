@@ -9,9 +9,12 @@ import json
 #         # Copy only the "text" dataset
 #         src_file.copy("text", dest_file)
 
-with h5py.File("output/dev/candidates_sample.h5") as candidates_file:
+with h5py.File("output_logprobs/test_sample/candidates_sample.h5") as candidates_file:
     candidates_text_h5ds = candidates_file["text"]
-    data_lines = open("vilem/scripts/data/jsonl/dev.jsonl").readlines()
+    candidates_logprobs = candidates_file["token_logprobs"]
+
+    breakpoint()
+    data_lines = open("vilem/scripts/data/jsonl/test_sample.jsonl").readlines()
 
     assert candidates_text_h5ds.shape[0] == len(data_lines)
 

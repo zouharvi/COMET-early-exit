@@ -58,7 +58,7 @@ LOGPROBS_FILENAME_BASE = "logprobs"
 SUM_LOGPROBS_H5DS_NAME = "sum"
 AVG_LOGPROBS_H5DS_NAME = "avg"
 
-CONFIDENCE_MODELS = ["models-lithium", "models-beryllium", "models-oxygen"]
+CONFIDENCE_MODELS = ["models-lithium", "models-beryllium", "models-oxygen", "models-nitrogen"]
 NO_CONFIDENCE_MODELS = ["models-hydrogen", "models-helium"]
 VILEM_MODELS = CONFIDENCE_MODELS + NO_CONFIDENCE_MODELS
 
