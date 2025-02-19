@@ -1,5 +1,5 @@
 earlyexitmulti:
-  class_path: comet.models.EarlyExitMultiRegression
+  class_path: comet_early_exit.models.EarlyExitMultiRegression
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True

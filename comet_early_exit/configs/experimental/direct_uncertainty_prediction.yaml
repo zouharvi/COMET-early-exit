@@ -1,5 +1,5 @@
 direct_uncertainty_prediction:
-  class_path: comet.models.DirectUncertaintyPrediction
+  class_path: comet_early_exit.models.DirectUncertaintyPrediction
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True

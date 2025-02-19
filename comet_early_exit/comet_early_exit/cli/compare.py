@@ -71,7 +71,7 @@ from sacrebleu.utils import get_reference_files, get_source_file
 from scipy import stats
 from tabulate import tabulate
 
-from comet import download_model, load_from_checkpoint
+from comet_early_exit import download_model, load_from_checkpoint
 
 torch.set_float32_matmul_precision('high')
 

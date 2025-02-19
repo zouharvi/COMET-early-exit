@@ -26,10 +26,10 @@ import torch
 from torch import nn
 from transformers.optimization import Adafactor, get_constant_schedule_with_warmup
 
-from comet.models.base import CometModel
-from comet.models.metrics import RegressionMetrics
-from comet.models.utils import Prediction, Target
-from comet.modules import FeedForward
+from comet_early_exit.models.base import CometModel
+from comet_early_exit.models.metrics import RegressionMetrics
+from comet_early_exit.models.utils import Prediction, Target
+from comet_early_exit.modules import FeedForward
 
 
 class RegressionMetric(CometModel):

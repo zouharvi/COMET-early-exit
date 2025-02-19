@@ -24,9 +24,9 @@ from typing import Dict, List, Optional, Tuple, Union
 import pandas as pd
 import torch
 
-from comet.models.regression.regression_metric import RegressionMetric
-from comet.models.utils import Prediction, Target
-from comet.modules import FeedForward
+from comet_early_exit.models.regression.regression_metric import RegressionMetric
+from comet_early_exit.models.utils import Prediction, Target
+from comet_early_exit.modules import FeedForward
 
 
 class ReferencelessRegression(RegressionMetric):

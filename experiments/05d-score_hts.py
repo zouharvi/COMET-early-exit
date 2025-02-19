@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import csv
 import argparse
 import json
@@ -9,7 +9,7 @@ args = argparse.ArgumentParser()
 args.add_argument("checkpoint")
 args = args.parse_args()
 
-model = comet.load_from_checkpoint(args.checkpoint)
+model = comet_early_exit.load_from_checkpoint(args.checkpoint)
 data = list(csv.DictReader(open("data/csv/test_da.csv", "r")))
 out = model.predict(data, batch_size=128)
 pred_y = out[0]

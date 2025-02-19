@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import csv
 import scipy.stats
 import argparse
@@ -7,7 +7,7 @@ args = argparse.ArgumentParser()
 args.add_argument("model")
 args = args.parse_args()
 
-model = comet.load_from_checkpoint(args.model)
+model = comet_early_exit.load_from_checkpoint(args.model)
 data = list(csv.DictReader(open("data/csv/test_sodium.csv", "r")))
 pred_error = model.predict(data, batch_size=128)["scores"]
 

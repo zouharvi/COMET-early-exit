@@ -20,7 +20,7 @@ RemBERT Encoder
 """
 from transformers import RemBertConfig, RemBertModel, RemBertTokenizerFast
 
-from comet.encoders.xlmr import Encoder, XLMREncoder
+from comet_early_exit.encoders.xlmr import Encoder, XLMREncoder
 
 
 class RemBERTEncoder(XLMREncoder):

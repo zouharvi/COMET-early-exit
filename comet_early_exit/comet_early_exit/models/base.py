@@ -30,8 +30,8 @@ import pytorch_lightning as ptl
 import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, Subset
 
-from comet.encoders import str2encoder
-from comet.modules import LayerwiseAttention
+from comet_early_exit.encoders import str2encoder
+from comet_early_exit.modules import LayerwiseAttention
 
 from .lru_cache import tensor_lru_cache
 from .pooling_utils import average_pooling, max_pooling

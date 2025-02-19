@@ -2,6 +2,7 @@ data/
 lightning_logs/
 computed/
 figures/
+huggingface
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

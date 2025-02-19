@@ -1,7 +1,7 @@
 from datasets import load_dataset
 import argparse
 import scipy.stats
-import comet
+import comet_early_exit
 
 args = argparse.ArgumentParser()
 args.add_argument("model", type=str)
@@ -17,7 +17,7 @@ data = [
     for x in data
 ]
 
-model = comet.load_from_checkpoint(args.model)
+model = comet_early_exit.load_from_checkpoint(args.model)
 scores_pred = model.predict(data, batch_size=128)["scores"]
 
 print(scipy.stats.pearsonr([x["score"] for x in data], scores_pred))

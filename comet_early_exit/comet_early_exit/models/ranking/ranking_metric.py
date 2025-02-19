@@ -30,9 +30,9 @@ import torch.nn.functional as F
 from torch import nn
 from transformers.optimization import Adafactor, get_constant_schedule_with_warmup
 
-from comet.models.base import CometModel
-from comet.models.metrics import WMTKendall
-from comet.models.utils import Prediction
+from comet_early_exit.models.base import CometModel
+from comet_early_exit.models.metrics import WMTKendall
+from comet_early_exit.models.utils import Prediction
 
 
 class RankingMetric(CometModel):

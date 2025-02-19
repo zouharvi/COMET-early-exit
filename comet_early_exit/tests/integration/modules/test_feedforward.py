@@ -6,7 +6,7 @@ from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from torch import nn
 
-from comet.modules.feedforward import FeedForward
+from comet_early_exit.modules.feedforward import FeedForward
 from pytorch_lightning import seed_everything
 
 

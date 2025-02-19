@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import csv
 import argparse
 import json
@@ -8,7 +8,7 @@ args.add_argument("checkpoint")
 args.add_argument("--mc-dropout", type=int, default=0)
 args = args.parse_args()
 
-model = comet.load_from_checkpoint(args.checkpoint)
+model = comet_early_exit.load_from_checkpoint(args.checkpoint)
 data = list(csv.DictReader(open("data/csv/test_da.csv", "r")))
 out = model.predict(data, batch_size=64, mc_dropout=args.mc_dropout)
 pred_y = out["scores"]

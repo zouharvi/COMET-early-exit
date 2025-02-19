@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import json
 import utils_candidates
 import random
@@ -11,8 +11,8 @@ args = args.parse_args()
 # TODO: use full data
 data = random.sample(utils_candidates.get_data(args.data), k=500)
 
-model_helium = comet.load_from_checkpoint("../COMET-early-exit/lightning_logs/helium2hydrogen/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
-model_beryllium = comet.load_from_checkpoint("../COMET-early-exit/lightning_logs/version_22504386/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt")
+model_helium = comet_early_exit.load_from_checkpoint("comet_early_exit/lightning_logs/helium2hydrogen/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
+model_beryllium = comet_early_exit.load_from_checkpoint("comet_early_exit/lightning_logs/version_22504386/checkpoints/epoch=4-step=29320-val_avg_pearson=0.259.ckpt")
 
 data_flat = [
     {

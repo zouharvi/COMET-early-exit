@@ -1,5 +1,5 @@
 instantconf_metric:
-  class_path: comet.models.InstantConfRegression
+  class_path: comet_early_exit.models.InstantConfRegression
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True

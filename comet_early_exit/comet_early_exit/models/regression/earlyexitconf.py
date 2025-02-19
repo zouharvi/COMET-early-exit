@@ -28,12 +28,12 @@ import torch
 
 from torch.utils.data import DataLoader, SequentialSampler
 from ..predict_writer import CustomWriter
-from comet.modules import LayerwiseAttention
 
-from comet.models.regression.regression_metric import RegressionMetric
-from comet.models.utils import Prediction, Target
-from comet.modules import FeedForward
-from comet.models.metrics import EarlyExitMetrics
+from comet_early_exit.modules import LayerwiseAttention
+from comet_early_exit.models.regression.regression_metric import RegressionMetric
+from comet_early_exit.models.utils import Prediction, Target
+from comet_early_exit.modules import FeedForward
+from comet_early_exit.models.metrics import EarlyExitMetrics
 from torch import nn
 import pytorch_lightning as ptl
 from ..predict_pbar import PredictProgressBar

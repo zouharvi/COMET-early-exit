@@ -73,30 +73,30 @@ function sbatch_gpu_big_short() {
 
 
 
-sbatch_gpu_big "train_helium" "comet-train --cfg configs/experimental/baseline_model.yaml"
-sbatch_gpu_big "train_helium_fused" "comet-train --cfg configs/experimental/baseline_model.yaml"
-sbatch_gpu_big "train_helium_pinned" "comet-train --cfg configs/experimental/baseline_model.yaml"
-sbatch_gpu_big "train_hydrogen" "comet-train --cfg configs/experimental/earlyexit_model.yaml"
-sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg configs/experimental/earlyexitconf_model_human.yaml"
-sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg configs/experimental/earlyexitconf_model_last.yaml"
-sbatch_gpu_big "train_boron" "comet-train --cfg configs/experimental/baseline_model_boron.yaml"
-sbatch_gpu_big "train_carbon" "comet-train --cfg configs/experimental/baseline_model_carbon.yaml"
-sbatch_gpu_big "train_nitrogen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last_old.yaml"
-sbatch_gpu_bigg "train_oxygen" "comet-train --cfg configs/experimental/earlyexitconfmulti_model_last.yaml"
-sbatch_gpu_bigg "train_fluorine" "comet-train --cfg configs/experimental/baseline_model_fluorine.yaml"
-sbatch_gpu_bigg "train_neon" "comet-train --cfg configs/experimental/baseline_model_neon.yaml"
-sbatch_gpu_bigg "train_sodium" "comet-train --cfg configs/experimental/baseline_model_sodium.yaml"
-sbatch_gpu_bigg "train_magnesium" "comet-train --cfg configs/experimental/instantconf_model.yaml"
-sbatch_gpu_bigg "train_aluminium" "comet-train --cfg configs/experimental/direct_uncertainty_prediction.yaml"
-sbatch_gpu_big "train_silicon" "comet-train --cfg configs/experimental/earlyexitmulti_model.yaml"
-sbatch_gpu_big "train_sulfur" "comet-train --cfg configs/experimental/instantconf_model_025.yaml"
-sbatch_gpu_big "train_chlorine" "comet-train --cfg configs/experimental/instantconf_model_15.yaml"
-sbatch_gpu_big "train_argon" "comet-train --cfg configs/experimental/instantconf_model_075.yaml"
-sbatch_gpu_big "train_phosphorus" "comet-train --cfg configs/experimental/instantconf_model_10.yaml"
+sbatch_gpu_big "train_helium" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model.yaml"
+sbatch_gpu_big "train_helium_fused" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model.yaml"
+sbatch_gpu_big "train_helium_pinned" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model.yaml"
+sbatch_gpu_big "train_hydrogen" "comet-train --cfg comet_early_exit/configs/experimental/earlyexit_model.yaml"
+sbatch_gpu_big "train_lithium_confidence_human" "comet-train --cfg comet_early_exit/configs/experimental/earlyexitconf_model_human.yaml"
+sbatch_gpu_big "train_beryllium_confidence_last" "comet-train --cfg comet_early_exit/configs/experimental/earlyexitconf_model_last.yaml"
+sbatch_gpu_big "train_boron" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model_boron.yaml"
+sbatch_gpu_big "train_carbon" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model_carbon.yaml"
+sbatch_gpu_big "train_nitrogen" "comet-train --cfg comet_early_exit/configs/experimental/earlyexitconfmulti_model_last_old.yaml"
+sbatch_gpu_bigg "train_oxygen" "comet-train --cfg comet_early_exit/configs/experimental/earlyexitconfmulti_model_last.yaml"
+sbatch_gpu_bigg "train_fluorine" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model_fluorine.yaml"
+sbatch_gpu_bigg "train_neon" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model_neon.yaml"
+sbatch_gpu_bigg "train_sodium" "comet-train --cfg comet_early_exit/configs/experimental/baseline_model_sodium.yaml"
+sbatch_gpu_bigg "train_magnesium" "comet-train --cfg comet_early_exit/configs/experimental/instantconf_model.yaml"
+sbatch_gpu_bigg "train_aluminium" "comet-train --cfg comet_early_exit/configs/experimental/direct_uncertainty_prediction.yaml"
+sbatch_gpu_big "train_silicon" "comet-train --cfg comet_early_exit/configs/experimental/earlyexitmulti_model.yaml"
+sbatch_gpu_big "train_sulfur" "comet-train --cfg comet_early_exit/configs/experimental/instantconf_model_025.yaml"
+sbatch_gpu_big "train_chlorine" "comet-train --cfg comet_early_exit/configs/experimental/instantconf_model_15.yaml"
+sbatch_gpu_big "train_argon" "comet-train --cfg comet_early_exit/configs/experimental/instantconf_model_075.yaml"
+sbatch_gpu_big "train_phosphorus" "comet-train --cfg comet_early_exit/configs/experimental/instantconf_model_10.yaml"
 
 # make sure to use ZervaCOMET
-sbatch_gpu_big "train_potassium" "comet-train --cfg configs/models/baseline_hts.yaml"
-sbatch_gpu_big "train_calcium" "comet-train --cfg configs/models/baseline_hts2.yaml"
+sbatch_gpu_big "train_potassium" "comet-train --cfg comet_early_exit/configs/models/baseline_hts.yaml"
+sbatch_gpu_big "train_calcium" "comet-train --cfg comet_early_exit/configs/models/baseline_hts2.yaml"
 
 
 # remove all but last checkpoint
@@ -112,6 +112,7 @@ tar -C lightning_logs/helium2hydrogen/ -cf lightning_logs/model-helium2hydrogen.
 tar -C lightning_logs/version_22525421/ -cf lightning_logs/model-carbon.tar .
 tar -C lightning_logs/version_22525435/ -cf lightning_logs/model-oxygen.tar .
 tar -C lightning_logs/version_22525433/ -cf lightning_logs/model-nitrogen.tar .
+tar -C lightning_logs/version_22525447/ -cf lightning_logs/model-magnesium.tar .
 
 rclone copy lightning_logs/model-helium.tar polybox:t/
 rclone copy lightning_logs/model-hydrogen.tar polybox:t/
@@ -122,3 +123,4 @@ rclone copy lightning_logs/model-helium2hydrogen.tar polybox:t/
 rclone copy lightning_logs/model-carbon.tar polybox:t/
 rclone copy lightning_logs/model-oxygen.tar polybox:t/
 rclone copy lightning_logs/model-nitrogen.tar polybox:t/
+rclone copy lightning_logs/model-magnesium.tar polybox:t/

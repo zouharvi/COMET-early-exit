@@ -1,5 +1,5 @@
 unified_metric:
-  class_path: comet.models.UnifiedMetric
+  class_path: comet_early_exit.models.UnifiedMetric
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True

@@ -23,7 +23,7 @@ import torch
 import torch.nn as nn
 from tokenizers import Encoding
 
-from comet.models.utils import LabelSet
+from comet_early_exit.models.utils import LabelSet
 
 
 class Encoder(nn.Module, metaclass=abc.ABCMeta):

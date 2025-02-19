@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from comet.encoders.xlmr import XLMREncoder
+from comet_early_exit.encoders.xlmr import XLMREncoder
 
 
 class TestXLMREncoder(unittest.TestCase):

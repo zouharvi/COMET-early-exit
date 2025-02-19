@@ -1,5 +1,5 @@
 regression_metric:
-  class_path: comet.models.RegressionMetric
+  class_path: comet_early_exit.models.RegressionMetric
   init_args:
     nr_frozen_epochs: 0.3
     keep_embeddings_frozen: True

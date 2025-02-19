@@ -22,8 +22,8 @@ from typing import Dict
 import torch
 from transformers import XLMRobertaConfig, XLMRobertaModel, XLMRobertaTokenizerFast
 
-from comet.encoders.base import Encoder
-from comet.encoders.bert import BERTEncoder
+from comet_early_exit.encoders.base import Encoder
+from comet_early_exit.encoders.bert import BERTEncoder
 
 
 class XLMREncoder(BERTEncoder):

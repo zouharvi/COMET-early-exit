@@ -2,7 +2,6 @@
 
 
 rsync -azP --filter=":- .gitignore" --exclude .git/ . euler:/cluster/work/sachan/vilem/COMET-early-exit-experiments/
-# rsync -azP --filter=":- .gitignore" --exclude .git/ . euler:/cluster/work/sachan/vilem/COMET-early-exit/
 # rsync -azP --filter=":- .gitignore" --exclude .git/ . euler:/cluster/work/sachan/vilem/COMET-zerva/
 
 # rsync -azP data/jsonl/ euler:/cluster/work/sachan/vilem/COMET-early-exit/data/jsonl

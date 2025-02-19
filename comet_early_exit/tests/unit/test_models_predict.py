@@ -6,8 +6,8 @@ import unittest
 import numpy as np
 import torch
 
-from comet import download_model, load_from_checkpoint
-from comet.models import XCOMETMetric
+from comet_early_exit import download_model, load_from_checkpoint
+from comet_early_exit.models import XCOMETMetric
 from tests.data import DATA_PATH
 
 TEST_SAMPLES = [

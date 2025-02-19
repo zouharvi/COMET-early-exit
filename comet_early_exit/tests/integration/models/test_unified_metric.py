@@ -11,7 +11,7 @@ from pytorch_lightning.trainer.trainer import Trainer
 from scipy.stats import pearsonr
 from torch.utils.data import DataLoader
 
-from comet.models import UnifiedMetric
+from comet_early_exit.models import UnifiedMetric
 from tests.data import DATA_PATH
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

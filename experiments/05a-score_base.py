@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import csv
 import scipy.stats
 import numpy as np
@@ -11,7 +11,7 @@ args.add_argument("checkpoint")
 args.add_argument("--print", action="store_true")
 args = args.parse_args()
 
-model = comet.load_from_checkpoint(args.checkpoint)
+model = comet_early_exit.load_from_checkpoint(args.checkpoint)
 data = list(csv.DictReader(open("data/csv/test_da.csv", "r")))
 pred_y = np.array(model.predict(data, batch_size=128)["scores"]).T
 

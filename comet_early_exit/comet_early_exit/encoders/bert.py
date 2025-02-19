@@ -22,7 +22,7 @@ from typing import Dict, Optional
 import torch
 from transformers import BertConfig, BertModel, BertTokenizerFast
 
-from comet.encoders.base import Encoder
+from comet_early_exit.encoders.base import Encoder
 
 
 class BERTEncoder(Encoder):

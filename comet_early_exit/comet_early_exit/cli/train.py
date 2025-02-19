@@ -40,7 +40,7 @@ from pytorch_lightning.callbacks import (
 )
 from pytorch_lightning.trainer.trainer import Trainer
 
-from comet.models import (
+from comet_early_exit.models import (
     EarlyExitRegression, EarlyExitConfRegression,
     EarlyExitConfMultiRegression, EarlyExitConfMultiRegressionExtra,
     EarlyExitMultiRegression,

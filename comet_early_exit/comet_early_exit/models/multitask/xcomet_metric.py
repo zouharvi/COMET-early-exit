@@ -25,9 +25,9 @@ from typing import Dict, List, Optional, Union
 import torch
 from torch import nn
 
-from comet.models.multitask.unified_metric import UnifiedMetric
-from comet.models.utils import Prediction
-from comet.modules import FeedForward
+from comet_early_exit.models.multitask.unified_metric import UnifiedMetric
+from comet_early_exit.models.utils import Prediction
+from comet_early_exit.modules import FeedForward
 
 
 class XCOMETMetric(UnifiedMetric):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from comet.encoders.rembert import RemBERTEncoder
+from comet_early_exit.encoders.rembert import RemBERTEncoder
 
 
 class TestRemBERTEncoder(unittest.TestCase):

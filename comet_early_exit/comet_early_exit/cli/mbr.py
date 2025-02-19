@@ -53,7 +53,7 @@ from jsonargparse import ArgumentParser
 from jsonargparse.typing import Path_fr
 from tqdm import tqdm
 
-from comet.models import RegressionMetric, download_model, load_from_checkpoint
+from comet_early_exit.models import RegressionMetric, download_model, load_from_checkpoint
 
 torch.set_float32_matmul_precision('high')
 

@@ -19,8 +19,8 @@ XLM-RoBERTa-XL Encoder
 """
 from transformers import XLMRobertaTokenizerFast, XLMRobertaXLConfig, XLMRobertaXLModel
 
-from comet.encoders.base import Encoder
-from comet.encoders.xlmr import XLMREncoder
+from comet_early_exit.encoders.base import Encoder
+from comet_early_exit.encoders.xlmr import XLMREncoder
 
 
 class XLMRXLEncoder(XLMREncoder):

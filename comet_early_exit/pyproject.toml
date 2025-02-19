@@ -27,10 +27,10 @@ include = [
 ]
 
 [tool.poetry.scripts]
-comet-train = 'comet.cli.train:train_command'
-comet-score = 'comet.cli.score:score_command'
-comet-compare = 'comet.cli.compare:compare_command'
-comet-mbr = 'comet.cli.mbr:mbr_command'
+comet-early-exit-train = 'comet_early_exit.cli.train:train_command'
+comet-early-exit-score = 'comet_early_exit.cli.score:score_command'
+comet-early-exit-compare = 'comet_early_exit.cli.compare:compare_command'
+comet-early-exit-mbr = 'comet_early_exit.cli.mbr:mbr_command'
 
 [tool.poetry.dependencies]
 python = "^3.8.0"

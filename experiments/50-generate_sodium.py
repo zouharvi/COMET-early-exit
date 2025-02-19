@@ -1,4 +1,4 @@
-import comet
+import comet_early_exit
 import csv
 import argparse
 
@@ -7,7 +7,7 @@ args.add_argument("data_in")
 args.add_argument("data_out")
 args = args.parse_args()
 
-model = comet.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
+model = comet_early_exit.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
 data = list(csv.DictReader(open(args.data_in, "r")))
 out = model.predict(data, batch_size=128)
 

@@ -20,7 +20,7 @@ MiniLM Encoder
 """
 from transformers import BertConfig, BertModel, XLMRobertaTokenizerFast
 
-from comet.encoders.xlmr import Encoder, XLMREncoder
+from comet_early_exit.encoders.xlmr import Encoder, XLMREncoder
 
 
 class MiniLMEncoder(XLMREncoder):

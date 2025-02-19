@@ -1,12 +1,12 @@
-import comet
+import comet_early_exit
 import scipy.stats
 import json
 from utils import FERTILITY
 
 data_orig = [json.loads(line) for line in open("data/jsonl/test.jsonl")]
 
-model_helium = comet.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
-model_carbon = comet.load_from_checkpoint("lightning_logs/version_22525421/checkpoints/epoch=4-step=29320-val_pearson=0.380.ckpt")
+model_helium = comet_early_exit.load_from_checkpoint("lightning_logs/version_22504094/checkpoints/epoch=4-step=29320-val_pearson=0.419.ckpt")
+model_carbon = comet_early_exit.load_from_checkpoint("lightning_logs/version_22525421/checkpoints/epoch=4-step=29320-val_pearson=0.380.ckpt")
 
 data_all = {
     p: [
