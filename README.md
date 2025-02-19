@@ -105,7 +105,7 @@ estimated errors  10.48   3.52   0.83
 ### COMET-partial
 
 This model is described in the appendix in the paper.
-It is able to score even incomplete translations:
+It is able to score even *incomplete* translations (i.e. prefixes of translations):
 ```python
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-partial"))
 data = [

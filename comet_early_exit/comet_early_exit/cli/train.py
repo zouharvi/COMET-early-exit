@@ -20,12 +20,12 @@ Command for training new Metrics.
 
 e.g:
 ```
-    comet-train --cfg configs/models/regression_metric.yaml --seed_everything 12
+    comet-early-exittrain --cfg configs/models/regression_metric.yaml --seed_everything 12
 ```
 
 For more details run the following command:
 ```
-    comet-train --help
+    comet-early-exittrain --help
 ```
 """
 import json

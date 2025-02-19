@@ -8,7 +8,6 @@ repository = "https://github.com/zouharvi/COMET-early-exit"
 keywords = [
     "Machine Translation", 
     "Evaluation",
-    "Unbabel",
     "COMET"
 ]
 classifiers = [
@@ -23,7 +22,6 @@ packages = [
 include = [
     "LICENSE",
     "pyproject.toml",
-    "CONTRIBUTING.md"
 ]
 
 [tool.poetry.scripts]

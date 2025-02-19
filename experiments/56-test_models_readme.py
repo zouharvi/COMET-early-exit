@@ -1,9 +1,7 @@
 # %%
-
 import comet_early_exit
 
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-confidence"))
-# model = comet_early_exit.load_from_checkpoint("../huggingface/COMET-instant-confidence/checkpoints/model.ckpt")
 data = [
     {
         "src": "Can I receive my food in 10 to 15 minutes?",
@@ -22,9 +20,7 @@ assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 
 
 
 # %%
-
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-self-confidence"))
-# model = comet_early_exit.load_from_checkpoint("../huggingface/COMET-instant-self-confidence/checkpoints/model.ckpt")
 data = [
     {
         "src": "Can I receive my food in 10 to 15 minutes?",
@@ -47,9 +43,7 @@ assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 
 assert all(len(l) == 25 for l in model_output["scores"]) and all(len(l) == 25 for l in model_output["confidences"])
 
 # %%
-
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-partial"))
-# model = comet_early_exit.load_from_checkpoint("../huggingface/COMET-partial/checkpoints/model.ckpt")
 data = [
     {
         "src": "Can I receive my food in 10 to 15 minutes?",
