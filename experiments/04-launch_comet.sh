@@ -57,7 +57,6 @@ function sbatch_gpu_bigg() {
 }
 
 
-
 function sbatch_gpu_big_short() {
     JOB_NAME=$1;
     JOB_WRAP=$2;
@@ -98,8 +97,6 @@ sbatch_gpu_big "train_phosphorus" "comet-train --cfg configs/experimental/instan
 # make sure to use ZervaCOMET
 sbatch_gpu_big "train_potassium" "comet-train --cfg configs/models/baseline_hts.yaml"
 sbatch_gpu_big "train_calcium" "comet-train --cfg configs/models/baseline_hts2.yaml"
-
-
 
 
 # remove all but last checkpoint

@@ -59,6 +59,6 @@ print(json.dumps(data_out, ensure_ascii=False))
 
 """
 # run me from COMET-early-exit-experiments
-sbatch_gpu_big_short "score_candidates_reranking_sample" "python3 vilem/32-score_reranking_candidates_earlyexit.py --data sample"
-sbatch_gpu_big_short "score_candidates_reranking_beam" "python3 vilem/32-score_reranking_candidates_earlyexit.py --data beam"
+sbatch_gpu_big_short "score_candidates_reranking_sample" "python3 experiments/32-score_reranking_candidates_earlyexit.py --data sample"
+sbatch_gpu_big_short "score_candidates_reranking_beam" "python3 experiments/32-score_reranking_candidates_earlyexit.py --data beam"
 """

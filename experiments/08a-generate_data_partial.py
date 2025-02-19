@@ -26,7 +26,7 @@ with open(args.data_out, "w") as f:
     writer.writerows(data_out)
 
 """
-python3 vilem/08-generate_data_partial.py data/jsonl/train.jsonl data/csv/train_partial.csv
-python3 vilem/08-generate_data_partial.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
-python3 vilem/08-generate_data_partial.py data/jsonl/test.jsonl data/csv/test_partial.csv
+python3 experiments/08-generate_data_partial.py data/jsonl/train.jsonl data/csv/train_partial.csv
+python3 experiments/08-generate_data_partial.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
+python3 experiments/08-generate_data_partial.py data/jsonl/test.jsonl data/csv/test_partial.csv
 """

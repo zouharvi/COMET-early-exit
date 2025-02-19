@@ -37,9 +37,9 @@ with open(args.data_out, "w") as f:
     writer.writerows(data_out)
 
 """
-python3 vilem/40-generate_data_partial_fluorine.py data/jsonl/train.jsonl data/csv/train_fluorine.csv
-python3 vilem/40-generate_data_partial_fluorine.py data/jsonl/dev.jsonl data/csv/dev_fluorine.csv
-python3 vilem/40-generate_data_partial_fluorine.py data/jsonl/test.jsonl data/csv/test_fluorine.csv
+python3 experiments/40-generate_data_partial_fluorine.py data/jsonl/train.jsonl data/csv/train_fluorine.csv
+python3 experiments/40-generate_data_partial_fluorine.py data/jsonl/dev.jsonl data/csv/dev_fluorine.csv
+python3 experiments/40-generate_data_partial_fluorine.py data/jsonl/test.jsonl data/csv/test_fluorine.csv
 
 rsync -azP data/csv/*_fluorine.csv euler:/cluster/work/sachan/vilem/COMET-early-exit/data/csv/
 """

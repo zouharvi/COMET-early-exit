@@ -69,9 +69,9 @@ with open(args.data_out, "w") as f:
     writer.writerows(data_out)
 
 """
-python3 vilem/42-generate_data_partial_neon.py data/jsonl/train.jsonl data/csv/train_neon.csv
-python3 vilem/42-generate_data_partial_neon.py data/jsonl/dev.jsonl data/csv/dev_neon.csv
-python3 vilem/42-generate_data_partial_neon.py data/jsonl/test.jsonl data/csv/test_neon.csv
+python3 experiments/42-generate_data_partial_neon.py data/jsonl/train.jsonl data/csv/train_neon.csv
+python3 experiments/42-generate_data_partial_neon.py data/jsonl/dev.jsonl data/csv/dev_neon.csv
+python3 experiments/42-generate_data_partial_neon.py data/jsonl/test.jsonl data/csv/test_neon.csv
 
 rsync -azP data/csv/*_neon.csv euler:/cluster/work/sachan/vilem/COMET-early-exit/data/csv/
 """

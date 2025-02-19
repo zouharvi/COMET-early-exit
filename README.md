@@ -1,4 +1,4 @@
-# COMET-early-exit-experiments
+# COMET-early-exit
 
 This repository contains code for the paper [Early-Exit and Instant Confidence Translation Quality Estimation](TODO) by Vilém Zouhar, Maike Züfle, Beni Egressy, Julius Cheng, Jan Niehues.
 
@@ -14,6 +14,8 @@ This repository contains code for the paper [Early-Exit and Instant Confidence T
 > We combine Early-Exit COMET with an upper confidence bound bandit algorithm to find the best candidate from a large pool without having to run the full evaluation model on all candidates.
 > In both cases (evaluation and reranking) our methods reduce the required compute by 50% with very little degradation in performance.
 
+<img src="meta/14-plot_conf_individual.svg" width="500em">
+
 ## Running pre-trained models
 
 The implementation for the various COMET models is kept in [comet_early_exit](comet_early_exit).
@@ -28,27 +30,116 @@ cd COMET-early-exit
 pip3 install -e comet_early_exit
 ```
 
-Then, this package can be used in Python:
-
+Then, this package can be used in Python with `comet_early_exit` package.
+The package name changed intentionally from Unbabel's package name such that they are not mutually exclusive.
 ```python
 import comet_early_exit
-model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("TODO"))
+model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-confidence"))
 ```
 
-TODO
+We offer three public models on HuggingFace: [COMET-instant-confidence](TODO), [COMET-instant-self-confidence](TODO), and [COMET-partial](TODO) train in various regimes on direct assessment up to WMT2022.
+All models are reference-less, requiring only the source and the translation.
 
-## Training your own models
+### COMET-instant-confidence
 
+Behaves like standard quality estimation, but outputs two numbers: `scores` (as usual) and `confidences`, which is the estimated mean absolute error from the human score.
+Thus, contrary to expectations, higher "confidence" correponds to less correct QE estimation.
+```python
+model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-confidence"))
+data = [
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Moh bych obdržet jídlo v 10 do 15 minut?",
+    },
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych dostat jídlo během 10 či 15 minut?",
+    }
+]
+model_output = model.predict(data, batch_size=8, gpus=1)
+print("scores", model_output["scores"])
+print("estimated errors", model_output["confidences"])
+
+assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 2
+```
+Outputs:
+```
 TODO
+```
+
+### COMET-instant-self-confidence
+
+```python
+model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-self-confidence"))
+data = [
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Moh bych obdržet jídlo v 10 do 15 minut?",
+    },
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych dostat jídlo během 10 či 15 minut?",
+    }
+]
+model_output = model.predict(data, batch_size=8, gpus=1)
+
+# print predictions at 5th, 12th, and last layer
+print("scores", model_output["scores"][0][5], model_output["scores"][0][12], model_output["scores"][0][-1])
+print("estimated errors", model_output["confidences"][0][5], model_output["confidences"][0][12], model_output["confidences"][0][-1])
+
+# two top-level outputs
+assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 2
+# each output contains prediction per each layer
+assert all(len(l) for l in model_output["scores"] == 24) and all(len(l) for l in model_output["confidences"] == 24)
+```
+Outputs:
+```
+TODO
+```
+
+### COMET-partial
+
+This model is described in the appendix in the paper.
+It is able to score even incomplete translations:
+```python
+model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-partial"))
+data = [
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych",
+    },
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych dostat jídlo během 10 či 15 minut?",
+    },
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych dostat jídlo",
+    },
+    {
+        "src": "Can I receive my food in 10 to 15 minutes?",
+        "mt": "Mohl bych dostat jídlo během 10 či 15 minut?",
+    }
+]
+model_output = model.predict(data, batch_size=8, gpus=1)
+print("scores", model_output["scores"])
+```
+Outputs:
+```
+TODO
+```
+
 
 ## Replicating experiments in the paper
 
-TODO
+The [experiments/](experiments) directory contains scripts to run the experiments.
+This is intentionally separate from the [comet_early_exit/](comet_early_exit/) package, which is a fork of [Unbabel's COMET](https://github.com/Unbabel/COMET/) from version 2.2.4.
+For training your own models, as described in the paper, please see [experiments/04-launch_comet.sh](experiments/04-launch_comet.sh).
 
+Description of plotting and other experiments is WIP.
 
-## Misc
+## Citation
 
-Cite as:
 ```
 @misc{zouhar2025earlyexit,
       title={Early-Exit and Instant Confidence Translation Quality Estimation}, 

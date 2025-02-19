@@ -32,9 +32,9 @@ with open(args.data_out, "w") as f:
     writer.writerows(data_out)
 
 """
-python3 vilem/08b-generate_data_partial_rand.py data/jsonl/train.jsonl data/csv/train_partial.csv
-python3 vilem/08b-generate_data_partial_rand.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
-python3 vilem/08b-generate_data_partial_rand.py data/jsonl/test.jsonl data/csv/test_partial.csv
+python3 experiments/08b-generate_data_partial_rand.py data/jsonl/train.jsonl data/csv/train_partial.csv
+python3 experiments/08b-generate_data_partial_rand.py data/jsonl/dev.jsonl data/csv/dev_partial.csv
+python3 experiments/08b-generate_data_partial_rand.py data/jsonl/test.jsonl data/csv/test_partial.csv
 
 rsync -azP data/csv/*_partial.csv euler:/cluster/work/sachan/vilem/COMET-early-exit/data/csv/
 """
