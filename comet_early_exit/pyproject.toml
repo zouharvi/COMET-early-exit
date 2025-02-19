@@ -36,7 +36,7 @@ comet-early-exit-mbr = 'comet_early_exit.cli.mbr:mbr_command'
 python = "^3.8.0"
 sentencepiece = "^0.2.0"
 pandas = ">=1.4.1"
-transformers = "^4.17"
+transformers = ">=4.49"
 pytorch-lightning = "^2.0.0"
 jsonargparse = "3.13.1"
 torch = ">=1.6.0"

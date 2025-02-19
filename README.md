@@ -37,12 +37,13 @@ import comet_early_exit
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-confidence"))
 ```
 
-We offer three public models on HuggingFace: [COMET-instant-confidence](TODO), [COMET-instant-self-confidence](TODO), and [COMET-partial](TODO) train in various regimes on direct assessment up to WMT2022.
+We offer three public models on HuggingFace: [COMET-instant-confidence](https://huggingface.co/zouharvi/COMET-instant-confidence), [COMET-instant-self-confidence](https://huggingface.co/zouharvi/COMET-instant-self-confidence), and [COMET-partial](https://huggingface.co/zouharvi/COMET-partial) train in various regimes on direct assessment up to WMT2022.
 All models are reference-less, requiring only the source and the translation.
+The following snippets are taken from [experiments/56-test_models_readme.py](experiments/56-test_models_readme.py).
 
 ### COMET-instant-confidence
 
-Behaves like standard quality estimation, but outputs two numbers: `scores` (as usual) and `confidences`, which is the estimated mean absolute error from the human score.
+Behaves like standard quality estimation, but outputs two numbers: `scores` (as usual) and `confidences`, which is the estimated absolute error from the human score.
 Thus, contrary to expectations, higher "confidence" correponds to less correct QE estimation.
 ```python
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-confidence"))
@@ -62,13 +63,16 @@ print("estimated errors", model_output["confidences"])
 
 assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 2
 ```
-Outputs:
+Outputs (formatted):
 ```
-TODO
+scores            72.71  88.56
+estimated errors  15.63   9.74
 ```
 
 ### COMET-instant-self-confidence
 
+This model makes prediction at each of the 25 layers, both the score and the confidence.
+This time, the confidence is the absolute error with respect to the final layer's prediction.
 ```python
 model = comet_early_exit.load_from_checkpoint(comet_early_exit.download_model("zouharvi/COMET-instant-self-confidence"))
 data = [
@@ -90,11 +94,12 @@ print("estimated errors", model_output["confidences"][0][5], model_output["confi
 # two top-level outputs
 assert len(model_output["scores"]) == 2 and len(model_output["confidences"]) == 2
 # each output contains prediction per each layer
-assert all(len(l) for l in model_output["scores"] == 24) and all(len(l) for l in model_output["confidences"] == 24)
+assert all(len(l) == 25 for l in model_output["scores"]) and all(len(l) == 25 for l in model_output["confidences"])
 ```
-Outputs:
+Outputs (formatted):
 ```
-TODO
+scores            75.60  86.60  85.74
+estimated errors  10.48   3.52   0.83
 ```
 
 ### COMET-partial
@@ -110,10 +115,6 @@ data = [
     },
     {
         "src": "Can I receive my food in 10 to 15 minutes?",
-        "mt": "Mohl bych dostat jídlo během 10 či 15 minut?",
-    },
-    {
-        "src": "Can I receive my food in 10 to 15 minutes?",
         "mt": "Mohl bych dostat jídlo",
     },
     {
@@ -124,9 +125,9 @@ data = [
 model_output = model.predict(data, batch_size=8, gpus=1)
 print("scores", model_output["scores"])
 ```
-Outputs:
+Outputs (formatted):
 ```
-TODO
+scores 89.18  86.52  89.20
 ```
 
 
