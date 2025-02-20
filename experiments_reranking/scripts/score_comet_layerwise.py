@@ -205,18 +205,3 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(args)
-
-# python scripts/score_comet_layerwise.py vilem/scripts/data toy output --comet_repo=Unbabel/wmt22-cometkiwi-da
-# python scripts/score_comet_layerwise.py vilem/scripts/data toy output --comet_path=models-hydrogen/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data toy output --comet_path=models-lithium/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data toy output --comet_path=models-beryllium/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data toy output --comet_path=models-helium/checkpoints/model.ckpt
-
-# python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_repo=Unbabel/wmt22-cometkiwi-da
-# python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-hydrogen/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-lithium/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-beryllium/checkpoints/model.ckpt
-# python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-helium/checkpoints/model.ckpt
-# # python scripts/score_comet_layerwise.py vilem/scripts/data dev output --comet_path=models-oxygen/checkpoints/model.ckpt
-
-#python scripts/score_comet_layerwise.py vilem/scripts/data dev  output_blub --comet_path "zouharvi/COMET-instant-self-confidence"
