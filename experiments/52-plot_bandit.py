@@ -20,7 +20,7 @@ METHOD_TO_NAME = {
 
 for name, data in [("beam", data_beam), ("sample", data_sample)]:
     for mode in ["avg_score", "win_rate"]:
-        fout = open(f"../computed/52-bandit_{mode}_{name}.tex", "w")
+        fout = open(f"../computed/52-bandit_{mode}_{name}.tab.tex", "w")
         print(r"\begin{tabular}{lYYYYYYYYY}", file=fout)
         # NOTE: be careful that the costs are always aligned
 
