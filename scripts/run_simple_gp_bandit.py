@@ -81,7 +81,9 @@ def load_scores_and_similarities(
         for metric_idx, model_name in zip(model_metric_idxs, model_names):
 
             h5_filename = split_work_dir / f"scores_comet_{model_name}_{args.generation_mode}.h5"
+            print(h5_filename) # output_emb/test_sample/scores_comet_models-oxygen_sample.h5
             with h5py.File(h5_filename) as scores_h5:
+                breakpoint()
                 scores_h5ds = scores_h5["scoresmodels-oxygen_24"] #[utils.COMET_SCORES_H5DS_NAME]
 
                 scores[:, :, metric_idx] = scores_h5ds[data_idxs]
@@ -99,7 +101,6 @@ def load_scores_and_similarities(
             instance_scores.append(scores[idx, :num_cands])
             sims.append(sim_h5ds[data_idx].reshape(max_cands, max_cands)[:num_cands, :num_cands])
 
-        breakpoint()
         return instance_scores, sims, counts, sum_logprobs, avg_logprobs
 
 
@@ -114,6 +115,8 @@ def main(args):
     all_scores, all_sims, all_counts, all_sum_logprobs, all_avg_logprobs = load_scores_and_similarities(
         args.data_dir, args.work_dir, args.split, args.model_class_name)
 
+    breakpoint()
+    
     INITIAL_SIZE = 10
     MAX_EVALS = 200
 

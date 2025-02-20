@@ -12,12 +12,13 @@ import logging
 import matplotlib.pyplot as plt
 import copy
 import pickle
+import os
 
 
 
 
 
-def read_data(args, model_class_name, use_confidences):
+def read_data(args, use_confidences):
 
     h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}_{args.generation_mode}.h5"
 
@@ -340,7 +341,14 @@ def main(args):
 
     utils.configure_logger("constant_layer_pred.py", output_path_base.with_suffix(".log"))
     logging.info("Reading data")
+<<<<<<< HEAD:scripts/bandit2.py
     scores, confs, logprobs = read_data(args, model_class_name=args.model_class_name, use_confidences=use_confidences)
+=======
+    scores, confs, logprobs = read_data(args, use_confidences=use_confidences)
+
+    save_dir = f"figures/{args.split}/{args.model_class_name}"
+    Path(save_dir).mkdir(parents=True, exist_ok=True)
+>>>>>>> e8c73686f4e820b692f2e2adefe2b8b3ec43e9ee:scripts/bandit.py
 
     if args.subsamples is None:
         subset_size = len(scores)
@@ -391,7 +399,7 @@ def main(args):
             }
             key_order_start.append(bandit_name)
 
-        filename = f'figures/test5/{args.model_class_name}_bandit_start_ablation_{str(subset_size)}'
+        filename = f'{save_dir}/bandit_start_ablation_{str(subset_size)}'
         if args.norm_confidences:
             filename += '_norm'
         filename += f"_ucb{str(ucb_factor).replace('.', '')}"
@@ -426,7 +434,7 @@ def main(args):
             }
             key_order_ucb.append(bandit_name)
 
-        filename = f'figures/test5/{args.model_class_name}_bandit_ucb_ablation_{str(subset_size)}'
+        filename = f'{save_dir}/bandit_ucb_ablation_{str(subset_size)}'
         if args.norm_confidences:
             filename += '_norm'
         filename += f'_start{str(start_layer)}'
@@ -457,7 +465,11 @@ def main(args):
     }
     key_order_single.append(bandit_name)
 
+<<<<<<< HEAD:scripts/bandit2.py
     filename = f"figures/test5/{args.model_class_name}_bandit_start_{str(subset_size)}_ucb_{str(ucb_factor).replace('.', '')}"
+=======
+    filename = f'{save_dir}/bandit_start_{str(subset_size)}_ucb_{str(ucb_factor).replace('.', '')}'
+>>>>>>> e8c73686f4e820b692f2e2adefe2b8b3ec43e9ee:scripts/bandit.py
     if args.norm_confidences:
         filename += '_norm'
     filename += str(args.generation_mode)
@@ -526,6 +538,11 @@ if __name__ == "__main__":
 
 
 
+<<<<<<< HEAD:scripts/bandit2.py
 # python scripts/bandit2.py vilem/scripts/data test_sample output_emb models-oxygen --use_confidences --norm_confidences --ucb_ablation --start_layer_ablation --subsamples 100
 
+=======
+# python scripts/bandit.py vilem/scripts/data test_sample   output models-oxygen --use_confidences --norm_confidences --generation_mode sample --start_layer_ablation --ucb_ablation --subsamples 100 --logprobs
+>>>>>>> e8c73686f4e820b692f2e2adefe2b8b3ec43e9ee:scripts/bandit.py
 
+# python scripts/bandit.py vilem/scripts/data dev           output models-oxygen --use_confidences --norm_confidences --generation_mode sample --start_layer_ablation --ucb_ablation --subsamples 100

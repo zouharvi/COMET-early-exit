@@ -183,7 +183,6 @@ z_outputs
 data/*
 figures*
 
-scripts/bandit.py
 scripts/scratch.ipynb
 tmp
 Early_Exit_COMET (1).pdf
