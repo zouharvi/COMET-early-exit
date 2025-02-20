@@ -1,5 +1,9 @@
 # COMET-early-exit
 
+[![Paper](https://img.shields.io/badge/📜%20paper-481.svg)](TODO)
+&nbsp;
+[![Hugging Face Collection](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Collection-FCD21D)](https://huggingface.co/collections/zouharvi/comet-early-exit-67b5fc5db24bf87803cdb346)
+
 This repository contains code for the paper [Early-Exit and Instant Confidence Translation Quality Estimation](TODO) by Vilém Zouhar, Maike Züfle, Beni Egressy, Julius Cheng, Jan Niehues.
 
 > **Abstract:** 
