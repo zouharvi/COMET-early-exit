@@ -20,11 +20,13 @@ import pickle
 def read_data(args, model_class_name, use_confidences):
 
     h5_filename = Path(args.work_dir) / args.split / f"{utils.COMET_SCORES_H5DS_NAME}_comet_{args.model_class_name}_{args.generation_mode}.h5"
+
     h5_filename_candidates = Path(args.work_dir) / args.split / f"{utils.CANDIDATES_FILENAME}_{args.generation_mode}.h5"
 
     f = h5py.File(h5_filename, 'r')
     # sort layers and skip first one
     sorted_for_layers = sorted(f.keys(), key=lambda x: int(x.split("_")[-1]))[1:] # examples x candidates x layers
+
     data = np.stack([f[k][:] for k in sorted_for_layers], axis=-1)
     f.close()
 
@@ -50,6 +52,7 @@ def read_data(args, model_class_name, use_confidences):
     non_zero_mask = score_sums != 0
     instances_to_keep = np.any(non_zero_mask, axis=1)
     data = data[instances_to_keep]
+
 
     if use_confidences:
         data_conf = data_conf[instances_to_keep]
@@ -77,6 +80,8 @@ def read_data(args, model_class_name, use_confidences):
             logprob = logprob[unique_idx]
             logprob = logprob[non_zero_mask]
             new_logprobs.append(logprob)
+
+
 
     return new_data, new_confs, new_logprobs
 
@@ -336,6 +341,7 @@ def main(args):
     utils.configure_logger("constant_layer_pred.py", output_path_base.with_suffix(".log"))
     logging.info("Reading data")
     scores, confs, logprobs = read_data(args, model_class_name=args.model_class_name, use_confidences=use_confidences)
+
     if args.subsamples is None:
         subset_size = len(scores)
     else:
@@ -388,7 +394,7 @@ def main(args):
         filename = f'figures/test5/{args.model_class_name}_bandit_start_ablation_{str(subset_size)}'
         if args.norm_confidences:
             filename += '_norm'
-        filename += f'_ucb{str(ucb_factor).replace('.', '')}'
+        filename += f"_ucb{str(ucb_factor).replace('.', '')}"
         filename += str(args.generation_mode)
 
         fig = plot_things(results_dict_start, key_order=key_order_start)
@@ -451,7 +457,7 @@ def main(args):
     }
     key_order_single.append(bandit_name)
 
-    filename = f'figures/test5/{args.model_class_name}_bandit_start_{str(subset_size)}_ucb_{str(ucb_factor).replace('.', '')}'
+    filename = f"figures/test5/{args.model_class_name}_bandit_start_{str(subset_size)}_ucb_{str(ucb_factor).replace('.', '')}"
     if args.norm_confidences:
         filename += '_norm'
     filename += str(args.generation_mode)
@@ -520,6 +526,6 @@ if __name__ == "__main__":
 
 
 
-# python scripts/bandit.py vilem/scripts/data dev output models-oxygen --use_confidences --norm_confidences --ucb_ablation --start_layer_ablation --subsamples 100
+# python scripts/bandit2.py vilem/scripts/data test_sample output_emb models-oxygen --use_confidences --norm_confidences --ucb_ablation --start_layer_ablation --subsamples 100
 
 
