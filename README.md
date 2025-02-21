@@ -4,7 +4,7 @@
 &nbsp;
 [![Hugging Face Collection](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Collection-FCD21D)](https://huggingface.co/collections/zouharvi/comet-early-exit-67b5fc5db24bf87803cdb346)
 
-This repository contains code for the paper [Early-Exit and Instant Confidence Translation Quality Estimation](TODO) by Vilém Zouhar, Maike Züfle, Beni Egressy, Julius Cheng, Jan Niehues.
+This repository contains code for the paper [Early-Exit and Instant Confidence Translation Quality Estimation](http://arxiv.org/abs/2502.14429) by Vilém Zouhar, Maike Züfle, Beni Egressy, Julius Cheng, Jan Niehues.
 
 > **Abstract:** 
 > Quality estimation is omnipresent in machine translation, for both evaluation and generation.
