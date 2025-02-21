@@ -180,13 +180,13 @@ python scripts/bandit.py <data_dir> test <output_dir> COMET-instant-self-confide
 ## Citation
 
 ```
-@misc{zouhar2025earlyexit,
+@misc{zouhar2025earlyexitinstantconfidencetranslation,
       title={Early-Exit and Instant Confidence Translation Quality Estimation}, 
       author={Vilém Zouhar and Maike Züfle and Beni Egressy and Julius Cheng and Jan Niehues},
       year={2025},
-      eprint={TODO},
+      eprint={2502.14429},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={TODO},
+      url={https://arxiv.org/abs/2502.14429}, 
 }
 ```
