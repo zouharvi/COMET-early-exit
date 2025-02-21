@@ -1,6 +1,6 @@
 # COMET-early-exit
 
-[![Paper](https://img.shields.io/badge/📜%20paper-481.svg)](TODO)
+[![Paper](https://img.shields.io/badge/📜%20paper-481.svg)](http://arxiv.org/abs/2502.14429)
 &nbsp;
 [![Hugging Face Collection](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Collection-FCD21D)](https://huggingface.co/collections/zouharvi/comet-early-exit-67b5fc5db24bf87803cdb346)
 
