@@ -47,6 +47,10 @@ from ..utils import (
 )
 
 
+import multiprocessing.pool as mp_pool
+def _compute_attention(embeddings, attention_mask, layerwise_attention):
+    return layerwise_attention(embeddings, attention_mask)
+
 import os
 import logging
 
@@ -271,6 +275,7 @@ class EarlyExitConfMultiRegressionExtra(RegressionMetric):
         # add self.layer_index_param to the input
         # embedded_sequences = torch
         # last dimension is [2]
+        # TODO: can be output = self.estimator(embedded_sequences) which is faster
         output = self.estimator(embedded_sequences)
 
         output_score = output[:, :, 0]
@@ -336,11 +341,23 @@ class EarlyExitConfMultiRegressionExtra(RegressionMetric):
             input_ids, attention_mask, token_type_ids=token_type_ids
         )["all_layers"]
 
+
         if self.layerwise_attention:
-            embeddings = [
-                self.layerwise_attention[i](embeddings[:i+1], attention_mask)
-                for i in range(self.encoder.num_layers)
-            ]
+            # NOTE: parallelize
+            with mp_pool.ThreadPool(26) as pool:
+                embeddings = list(pool.starmap(
+                    _compute_attention,
+                    [
+                        (embeddings[:i+1], attention_mask, layerwise_attention)
+                        for i, layerwise_attention
+                        in zip(range(self.encoder.num_layers), self.layerwise_attention)]
+                ))
+
+            # NOTE: original
+            # embeddings = [
+            #     self.layerwise_attention[i](embeddings[:i+1], attention_mask)
+            #     for i in range(self.encoder.num_layers)
+            # ]
         
         # use CLS token
         # NOTE: if we use some intermediary computation, we mess up the graph?

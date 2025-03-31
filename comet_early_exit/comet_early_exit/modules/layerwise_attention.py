@@ -31,7 +31,6 @@ from typing import List, Optional
 import torch
 from torch.nn import Parameter, ParameterList
 
-
 class LayerwiseAttention(torch.nn.Module):
     def __init__(
         self,

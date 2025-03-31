@@ -255,6 +255,7 @@ class EarlyExitConfMultiRegression(RegressionMetric):
             (mt_sentembs, src_sentembs, prod_src, diff_src), dim=2
         )
         # last dimension is [2]
+        # TODO: can be output = self.estimator(embedded_sequences) which is faster
         output = torch.stack([
             estimator_i(embedded_sequence_i)
             for estimator_i, embedded_sequence_i in zip(self.estimator, embedded_sequences)

@@ -310,10 +310,13 @@ class InstantConfRegression(RegressionMetric):
 
         if self.layerwise_attention:
             embeddings = self.layerwise_attention(embeddings, attention_mask)
+            return embeddings[:,0,:]
         
-        # use CLS token
+        else:
+            # use CLS token
+            return embeddings[self.hparams.layer][:,0,:]
+        
         # NOTE: if we use some intermediary computation, we mess up the graph?
-        return embeddings[:,0,:]
 
     def predict_step(
         self,
