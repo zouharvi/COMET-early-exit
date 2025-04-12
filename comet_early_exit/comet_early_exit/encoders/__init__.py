@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .bert import BERTEncoder
-from .modernbert import ModernBERTEncoder
+# from .modernbert import ModernBERTEncoder
 from .minilm import MiniLMEncoder
 from .xlmr import XLMREncoder
 from .rembert import RemBERTEncoder
@@ -24,5 +24,5 @@ str2encoder = {
     "MiniLM": MiniLMEncoder,
     "XLM-RoBERTa-XL": XLMRXLEncoder,
     "RemBERT": RemBERTEncoder,
-    "ModernBERT": ModernBERTEncoder,
+    # "ModernBERT": ModernBERTEncoder,
 }
